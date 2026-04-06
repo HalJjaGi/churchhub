@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Church {
+  id          String   @id @default(cuid())
+  slug        String   @unique // URL용 식별자 (예: my-church)
+  name        String
+  description String?
+  theme       String   // 테마 설정 (JSON string)
+  modules     String   // 활성화된 모듈 목록 (JSON string)
+  plan        String   @default("starter") // starter, basic, pro, enterprise
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+  sermons     Sermon[]
+  notices     Notice[]
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  name      String?
+  role      String    @default("member") // admin, editor, member
+  churchId  String?
+  church    Church?   @relation(fields: [churchId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Sermon {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  speaker     String
+  date        DateTime @default(now())
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Notice {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
