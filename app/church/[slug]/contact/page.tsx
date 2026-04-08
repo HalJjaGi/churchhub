@@ -50,12 +50,12 @@ export default async function ContactPage({ params }: Props) {
           {/* 지도 섹션 */}
           <section className="bg-white rounded-lg shadow-md overflow-hidden">
             <div
-              className="h-64 bg-gray-300 flex items-center justify-center"
+              className="h-64 bg-gray-400 flex items-center justify-center"
               data-map="true"
               role="img"
               aria-label="교회 위치 지도"
             >
-              <div className="text-center text-gray-700">
+              <div className="text-center text-white">
                 <svg
                   className="w-12 h-12 mx-auto mb-2"
                   fill="none"

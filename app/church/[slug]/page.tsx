@@ -82,7 +82,7 @@ export default async function ChurchPage({
   }
   
   return (
-    <div
+    <main
       style={{
         '--color-primary': theme.colors.primary,
         '--color-secondary': theme.colors.secondary,
@@ -182,7 +182,7 @@ export default async function ChurchPage({
         <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-lg font-semibold mb-2">{church.name}</p>
-            <p className="opacity-80">
+            <p className="opacity-95">
               © {new Date().getFullYear()} All rights reserved.
             </p>
           </div>
