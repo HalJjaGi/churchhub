@@ -103,10 +103,7 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <div className="text-sm text-center text-gray-600">
-            <p>관리자 계정: admin@churchhub.dev</p>
-            <p className="mt-1">비밀번호: admin123!</p>
-          </div>
+
         </form>
       </div>
     </main>

@@ -3,8 +3,9 @@ import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
 import { sanitizeText, sanitizeURL } from '@/lib/sanitize'
 import { extractYouTubeId, getYouTubeThumbnail } from '@/lib/youtube'
+import { requireAdmin } from '@/lib/auth-guard'
 
-// 설교 상세 조회
+// 설교 상세 조회 (공개)
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -31,11 +32,14 @@ export async function GET(
   }
 }
 
-// 설교 수정
+// 설교 수정 (관리자만)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
@@ -71,11 +75,14 @@ export async function PUT(
   }
 }
 
-// 설교 삭제
+// 설교 삭제 (관리자만)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
@@ -88,7 +95,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: '설교가 삭제되었습니다.' })
   } catch (error) {
-    console.error('Error deleting sermon:', error)
+    console.error('Error deleting notice:', error)
     return NextResponse.json({ error: '설교 삭제에 실패했습니다.' }, { status: 500 })
   }
 }

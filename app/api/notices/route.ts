@@ -2,21 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
 import { sanitizeText } from '@/lib/sanitize'
+import { requireAdmin } from '@/lib/auth-guard'
 
-// 공지사항 목록 조회
+// 공지사항 목록 조회 (공개 - slug 기반만 허용)
 export async function GET(request: NextRequest) {
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
   const { searchParams } = new URL(request.url)
-  const churchId = searchParams.get('churchId')
   const slug = searchParams.get('slug')
 
   try {
-    const where = churchId ? { churchId } : slug ? { church: { slug } } : {}
-    
+    if (!slug) {
+      return NextResponse.json({ error: 'slug 파라미터가 필요합니다.' }, { status: 400 })
+    }
+
     const notices = await prisma.notice.findMany({
-      where,
+      where: { church: { slug } },
       include: { church: { select: { name: true, slug: true } } },
       orderBy: { createdAt: 'desc' },
     })
@@ -28,8 +30,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// 공지사항 추가
+// 공지사항 추가 (관리자만)
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 

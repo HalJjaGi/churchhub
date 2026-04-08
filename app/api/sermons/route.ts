@@ -3,21 +3,24 @@ import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
 import { sanitizeText, sanitizeURL } from '@/lib/sanitize'
 import { extractYouTubeId, getYouTubeThumbnail } from '@/lib/youtube'
+import { requireAdmin } from '@/lib/auth-guard'
 
-// 설교 목록 조회
+// 설교 목록 조회 (공개 - slug 기반만 허용)
 export async function GET(request: NextRequest) {
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
   const { searchParams } = new URL(request.url)
-  const churchId = searchParams.get('churchId')
   const slug = searchParams.get('slug')
 
   try {
-    const where = churchId ? { churchId } : slug ? { church: { slug } } : {}
-    
+    // slug 기반만 허용 (churchId 직접 조회 차단 → IDOR 방지)
+    if (!slug) {
+      return NextResponse.json({ error: 'slug 파라미터가 필요합니다.' }, { status: 400 })
+    }
+
     const sermons = await prisma.sermon.findMany({
-      where,
+      where: { church: { slug } },
       include: { church: { select: { name: true, slug: true } } },
       orderBy: { date: 'desc' },
     })
@@ -29,8 +32,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// 설교 추가
+// 설교 추가 (관리자만)
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 

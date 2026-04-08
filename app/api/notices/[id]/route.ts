@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
 import { sanitizeText } from '@/lib/sanitize'
+import { requireAdmin } from '@/lib/auth-guard'
 
-// 공지사항 상세 조회
+// 공지사항 상세 조회 (공개)
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -30,11 +31,14 @@ export async function GET(
   }
 }
 
-// 공지사항 수정
+// 공지사항 수정 (관리자만)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
@@ -59,11 +63,14 @@ export async function PUT(
   }
 }
 
-// 공지사항 삭제
+// 공지사항 삭제 (관리자만)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authError = await requireAdmin(request)
+  if (authError) return authError
+
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
