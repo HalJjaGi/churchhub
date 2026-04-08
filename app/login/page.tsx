@@ -82,6 +82,7 @@ export default function LoginPage() {
                 name="password"
                 type="password"
                 autoComplete="current-password"
+                inputMode="text"
                 required
                 minLength={8}
                 maxLength={128}

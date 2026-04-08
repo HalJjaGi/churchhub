@@ -232,16 +232,47 @@ async function main() {
     }),
   ])
 
-  // 테스트 사용자 생성 (비밀번호 포함)
-  const user = await prisma.user.create({
+  // Super Admin (할짜기 전용)
+  const superAdmin = await prisma.user.create({
     data: {
       email: 'admin@churchhub.dev',
       password: hashedPassword,
-      name: '관리자',
-      role: 'admin',
-      churchId: churches[0].id,
+      name: '슈퍼 관리자',
+      role: 'super_admin',
+      // churchId 없음 → 모든 교회 관리 가능
     },
   })
+
+  // Church Admin (각 교회별 관리자)
+  const churchAdmins = await Promise.all([
+    prisma.user.create({
+      data: {
+        email: 'admin@traditional-church.kr',
+        password: hashedPassword,
+        name: '전통교회 관리자',
+        role: 'church_admin',
+        churchId: churches[0].id,
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'admin@modern-church.kr',
+        password: hashedPassword,
+        name: '모던교회 관리자',
+        role: 'church_admin',
+        churchId: churches[1].id,
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'admin@minimal-church.kr',
+        password: hashedPassword,
+        name: '미니멀교회 관리자',
+        role: 'church_admin',
+        churchId: churches[2].id,
+      },
+    }),
+  ])
 
   // 샘플 설교 데이터 (각 교회에 2-3개씩)
   const sermonsData = [
@@ -449,8 +480,15 @@ async function main() {
   console.log(`Churches: ${churches.length}개`)
   console.log(`Sermons: ${sermonsData.length}개`)
   console.log(`Notices: ${noticesData.length}개`)
-  console.log('User:', user.email)
-  console.log('Password: admin123!')
+  console.log('')
+  console.log('👤 Super Admin:')
+  console.log(`  Email: ${superAdmin.email}`)
+  console.log('  Password: admin123!')
+  console.log('')
+  console.log('👥 Church Admins:')
+  churchAdmins.forEach((admin, i) => {
+    console.log(`  ${churches[i].name}: ${admin.email} / admin123!`)
+  })
 }
 
 main()

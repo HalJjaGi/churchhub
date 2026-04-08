@@ -11,6 +11,7 @@ async function checkRateLimit(req: NextRequest): Promise<Response | null> {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -45,6 +46,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           name: user.name,
           role: user.role,
+          churchId: user.churchId,
         }
       }
     })
@@ -57,6 +59,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role
+        token.churchId = (user as { churchId?: string }).churchId
       }
       return token
     },
@@ -64,6 +67,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.role = token.role as string
         session.user.id = token.sub as string
+        ;(session.user as { churchId?: string }).churchId = token.churchId as string
       }
       return session
     }

@@ -40,7 +40,7 @@ model User {
   email     String    @unique
   password  String
   name      String?
-  role      String    @default("member") // admin, editor, member
+  role      String    @default("member") // super_admin, church_admin, editor, member
   churchId  String?
   church    Church?   @relation(fields: [churchId], references: [id])
   createdAt DateTime  @default(now())
