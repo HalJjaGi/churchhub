@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -21,6 +21,13 @@ model Church {
   theme       String   // 테마 설정 (JSON string)
   modules     String   // 활성화된 모듈 목록 (JSON string)
   plan        String   @default("starter") // starter, basic, pro, enterprise
+  // 위치 및 연락처 정보
+  address     String?  // 주소
+  phone       String?  // 전화번호
+  email       String?  // 이메일
+  parking     String?  // 주차 안내
+  mapLat      Float?   // 지도 위도
+  mapLng      Float?   // 지도 경도
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   users       User[]
@@ -46,6 +53,8 @@ model Sermon {
   content     String
   speaker     String
   date        DateTime @default(now())
+  youtubeUrl  String?  // YouTube 영상 URL (선택)
+  thumbnail   String?  // 썸네일 이미지 URL (선택)
   churchId    String
   church      Church   @relation(fields: [churchId], references: [id])
   createdAt   DateTime @default(now())

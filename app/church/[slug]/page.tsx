@@ -188,6 +188,6 @@ export default async function ChurchPage({
           </div>
         </div>
       </footer>
-    </div>
+    </main>
   )
 }
