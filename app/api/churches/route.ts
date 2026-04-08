@@ -28,6 +28,9 @@ export async function GET() {
         description: true,
         plan: true,
         createdAt: true,
+        _count: {
+          select: { users: true, sermons: true, notices: true }
+        }
       },
       orderBy: {
         createdAt: 'desc',
@@ -48,7 +51,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth()
     
-    if (!session || session.user.role !== 'admin') {
+    if (!session || (session.user.role !== 'super_admin' && session.user.role !== 'admin')) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
