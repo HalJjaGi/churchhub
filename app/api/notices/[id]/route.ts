@@ -31,18 +31,24 @@ export async function GET(
   }
 }
 
-// 공지사항 수정 (관리자만)
+// 공지사항 수정 (관리자만 + 소유권 검증)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authError = await requireAdmin(request)
-  if (authError) return authError
-
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
   const { id } = await params
+
+  // 레코드 조회 후 churchId로 권한 검증
+  const existing = await prisma.notice.findUnique({ where: { id }, select: { churchId: true } })
+  if (!existing) {
+    return NextResponse.json({ error: '공지사항을 찾을 수 없습니다.' }, { status: 404 })
+  }
+
+  const authError = await requireAdmin(request, existing.churchId)
+  if (authError) return authError
 
   try {
     const body = await request.json()
@@ -63,24 +69,27 @@ export async function PUT(
   }
 }
 
-// 공지사항 삭제 (관리자만)
+// 공지사항 삭제 (관리자만 + 소유권 검증)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authError = await requireAdmin(request)
-  if (authError) return authError
-
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
   const { id } = await params
 
-  try {
-    await prisma.notice.delete({
-      where: { id },
-    })
+  // 레코드 조회 후 churchId로 권한 검증
+  const existing = await prisma.notice.findUnique({ where: { id }, select: { churchId: true } })
+  if (!existing) {
+    return NextResponse.json({ error: '공지사항을 찾을 수 없습니다.' }, { status: 404 })
+  }
 
+  const authError = await requireAdmin(request, existing.churchId)
+  if (authError) return authError
+
+  try {
+    await prisma.notice.delete({ where: { id } })
     return NextResponse.json({ message: '공지사항이 삭제되었습니다.' })
   } catch (error) {
     console.error('Error deleting notice:', error)

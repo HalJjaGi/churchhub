@@ -32,24 +32,29 @@ export async function GET(
   }
 }
 
-// 설교 수정 (관리자만)
+// 설교 수정 (관리자만 + 소유권 검증)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authError = await requireAdmin(request)
-  if (authError) return authError
-
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
   const { id } = await params
 
+  // 레코드 조회 후 churchId로 권한 검증
+  const existing = await prisma.sermon.findUnique({ where: { id }, select: { churchId: true } })
+  if (!existing) {
+    return NextResponse.json({ error: '설교를 찾을 수 없습니다.' }, { status: 404 })
+  }
+
+  const authError = await requireAdmin(request, existing.churchId)
+  if (authError) return authError
+
   try {
     const body = await request.json()
     const { title, content, speaker, date, youtubeUrl } = body
 
-    // YouTube 썸네일 자동 추출
     let thumbnail = undefined
     if (youtubeUrl !== undefined) {
       const videoId = extractYouTubeId(sanitizeURL(youtubeUrl))
@@ -75,27 +80,30 @@ export async function PUT(
   }
 }
 
-// 설교 삭제 (관리자만)
+// 설교 삭제 (관리자만 + 소유권 검증)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authError = await requireAdmin(request)
-  if (authError) return authError
-
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
   const { id } = await params
 
-  try {
-    await prisma.sermon.delete({
-      where: { id },
-    })
+  // 레코드 조회 후 churchId로 권한 검증
+  const existing = await prisma.sermon.findUnique({ where: { id }, select: { churchId: true } })
+  if (!existing) {
+    return NextResponse.json({ error: '설교를 찾을 수 없습니다.' }, { status: 404 })
+  }
 
+  const authError = await requireAdmin(request, existing.churchId)
+  if (authError) return authError
+
+  try {
+    await prisma.sermon.delete({ where: { id } })
     return NextResponse.json({ message: '설교가 삭제되었습니다.' })
   } catch (error) {
-    console.error('Error deleting notice:', error)
+    console.error('Error deleting sermon:', error)
     return NextResponse.json({ error: '설교 삭제에 실패했습니다.' }, { status: 500 })
   }
 }
