@@ -3,6 +3,27 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '../auth/[...nextauth]/route'
 
+const colorSchema = z.string().regex(/^#[0-9a-fA-F]{3,8}$/, 'Invalid color format')
+
+const themeSchema = z.object({
+  colors: z.object({
+    primary: colorSchema,
+    secondary: colorSchema,
+    accent: colorSchema,
+    background: colorSchema,
+  }),
+  font: z.enum(['serif', 'sans-serif']),
+  layout: z.enum(['traditional', 'modern', 'minimal']),
+})
+
+const modulesSchema = z.object({
+  sermon: z.boolean(),
+  notice: z.boolean(),
+  community: z.boolean(),
+  gallery: z.boolean(),
+  donation: z.boolean(),
+})
+
 const churchSchema = z.object({
   slug: z.string()
     .min(1, 'Slug is required')
@@ -15,6 +36,8 @@ const churchSchema = z.object({
     .max(500, 'Description must be 500 characters or less')
     .optional(),
   plan: z.enum(['starter', 'basic', 'pro', 'enterprise']).optional(),
+  theme: themeSchema.optional(),
+  modules: modulesSchema.optional(),
 })
 
 // GET /api/churches - 교회 목록 조회
@@ -74,11 +97,7 @@ export async function POST(request: NextRequest) {
       throw error
     }
     
-    const { slug, name, description, theme, modules, plan } = {
-      ...validated,
-      theme: body.theme,
-      modules: body.modules,
-    }
+    const { slug, name, description, theme, modules, plan } = validated
     
     // 슬러그 중복 확인
     const existing = await prisma.church.findUnique({

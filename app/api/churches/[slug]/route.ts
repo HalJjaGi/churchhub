@@ -3,6 +3,27 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { requireAdminForSlug } from '@/lib/auth-guard'
 
+const colorSchema = z.string().regex(/^#[0-9a-fA-F]{3,8}$/, 'Invalid color format')
+
+const themeSchema = z.object({
+  colors: z.object({
+    primary: colorSchema,
+    secondary: colorSchema,
+    accent: colorSchema,
+    background: colorSchema,
+  }),
+  font: z.enum(['serif', 'sans-serif']),
+  layout: z.enum(['traditional', 'modern', 'minimal']),
+})
+
+const modulesSchema = z.object({
+  sermon: z.boolean(),
+  notice: z.boolean(),
+  community: z.boolean(),
+  gallery: z.boolean(),
+  donation: z.boolean(),
+})
+
 const churchUpdateSchema = z.object({
   name: z.string()
     .min(1, 'Name is required')
@@ -12,6 +33,8 @@ const churchUpdateSchema = z.object({
     .max(500, 'Description must be 500 characters or less')
     .optional(),
   plan: z.enum(['starter', 'basic', 'pro', 'enterprise']).optional(),
+  theme: themeSchema.optional(),
+  modules: modulesSchema.optional(),
 })
 
 // GET /api/churches/[slug] - 특정 교회 조회
@@ -99,11 +122,7 @@ export async function PUT(
       throw error
     }
     
-    const { name, description, theme, modules, plan } = {
-      ...validated,
-      theme: body.theme,
-      modules: body.modules,
-    }
+    const { name, description, theme, modules, plan } = validated
     
     const updateData: any = {}
     if (name) updateData.name = name
