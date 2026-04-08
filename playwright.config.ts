@@ -24,5 +24,11 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  // 웹서버 자동 시작 비활성화 (이미 실행 중인 서버 사용)
+  // 웹서버 자동 시작 (이미 실행 중인 서버 사용)
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: true,
+    timeout: 120000,
+  },
 });

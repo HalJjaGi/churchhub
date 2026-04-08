@@ -1,0 +1,13 @@
+name = "churchhub"
+compatibility_date = "2024-01-01"
+
+[vars]
+NODE_VERSION = "22"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "churchhub"
+database_id = "preview-database-id"
+
+[site]
+bucket = "./out"

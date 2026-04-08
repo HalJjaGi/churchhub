@@ -176,7 +176,7 @@ export default async function ChurchPage({
 
       {/* Footer */}
       <footer
-        style={{ backgroundColor: 'var(--color-secondary)' }}
+        style={{ backgroundColor: 'var(--color-primary)' }}
         className="text-white mt-12"
       >
         <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">

@@ -5,7 +5,10 @@ async function main() {
   // 관리자 비밀번호 해시 생성
   const hashedPassword = await bcrypt.hash('admin123!', 10)
 
-  // Clear existing data
+  // Clear existing data (순서 중요: 외래키 제약)
+  await prisma.sermon.deleteMany()
+  await prisma.notice.deleteMany()
+  await prisma.user.deleteMany()
   await prisma.church.deleteMany()
 
   // 데모 교회 데이터 생성
