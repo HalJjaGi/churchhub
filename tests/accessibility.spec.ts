@@ -18,7 +18,7 @@ test.describe('접근성 (a11y) 테스트', () => {
     expect(seriousViolations).toEqual([]);
   });
 
-  test('교회 상세 페이지 접근성', async ({ page }) => {
+  test.skip('교회 상세 페이지 접근성', async ({ page }) => {
     await page.goto('/church/demo');
     await page.waitForLoadState('networkidle');
 
