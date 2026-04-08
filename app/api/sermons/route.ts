@@ -34,15 +34,16 @@ export async function GET(request: NextRequest) {
 
 // 설교 추가 (관리자만)
 export async function POST(request: NextRequest) {
-  const authError = await requireAdmin(request)
-  if (authError) return authError
-
   const rateLimitResponse = await apiRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
   try {
     const body = await request.json()
     const { title, content, speaker, date, youtubeUrl, churchId } = body
+
+    // churchId로 권한 검증
+    const authError = await requireAdmin(request, churchId)
+    if (authError) return authError
 
     if (!title || !content || !speaker || !churchId) {
       return NextResponse.json({ error: '필수 항목이 누락되었습니다.' }, { status: 400 })

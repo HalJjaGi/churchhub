@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { auth } from '../../auth/[...nextauth]/route'
+import { requireAdminForSlug } from '@/lib/auth-guard'
 
 const churchUpdateSchema = z.object({
   name: z.string()
@@ -79,17 +79,10 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await params
+  const { error: authError } = await requireAdminForSlug(request, slug)
+  if (authError) return authError
   try {
-    const session = await auth()
-    
-    if (!session || session.user.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-    
-    const { slug } = await params
     const body = await request.json()
     
     // Zod 검증
@@ -153,32 +146,26 @@ export async function PUT(
   }
 }
 
-// DELETE /api/churches/[slug] - 교회 삭제
+// DELETE /api/churches/[slug] - 교회 삭제 (Super Admin만)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await params
+
+  // 삭제는 Super Admin만
+  const SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
+  const { getToken } = await import('next-auth/jwt')
+  const token = await getToken({ req: request, secret: SECRET })
+  
+  if (!token || token.role !== 'super_admin') {
+    return NextResponse.json({ error: 'Super Admin 권한이 필요합니다.' }, { status: 403 })
+  }
+
   try {
-    const session = await auth()
-    
-    if (!session || session.user.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-    
-    const { slug } = await params
-    
-    await prisma.church.delete({
-      where: { slug },
-    })
-    
+    await prisma.church.delete({ where: { slug } })
     return NextResponse.json({ success: true })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
