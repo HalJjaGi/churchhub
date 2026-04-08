@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
         slug,
         name,
         description: description || null,
-        theme: theme || {
+        theme: theme ? JSON.stringify(theme) : JSON.stringify({
           colors: {
             primary: '#3b82f6',
             secondary: '#6b7280',
@@ -125,15 +125,21 @@ export async function POST(request: NextRequest) {
           },
           font: 'sans-serif',
           layout: 'modern',
-        },
-        modules: modules || {
+        }),
+        modules: modules ? JSON.stringify(modules) : JSON.stringify({
           sermon: true,
           notice: true,
           community: false,
           gallery: false,
           donation: false,
-        },
+        }),
         plan: plan || 'starter',
+        address: body.address || null,
+        phone: body.phone || null,
+        email: body.email || null,
+        parking: body.parking || null,
+        mapLat: body.mapLat ? parseFloat(body.mapLat) : null,
+        mapLng: body.mapLng ? parseFloat(body.mapLng) : null,
       },
     })
     
