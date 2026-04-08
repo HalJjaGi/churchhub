@@ -40,11 +40,11 @@ export default function NewChurchPage() {
     mapLng: '',
   })
 
-  // 교회명으로 slug 자동 생성
+  // 교회명으로 slug 자동 생성 (한글 제거, 영문/숫자만)
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
-      .replace(/[^a-z0-9가-힣\s-]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '')
@@ -84,7 +84,10 @@ export default function NewChurchPage() {
         router.push('/admin/churches')
       } else {
         const data = await res.json()
-        setError(data.error || '교회 추가에 실패했습니다.')
+        const msg = data.details 
+          ? data.details.map((d: {message: string}) => d.message).join(', ')
+          : data.error || '교회 추가에 실패했습니다.'
+        setError(msg)
       }
     } catch {
       setError('오류가 발생했습니다.')
