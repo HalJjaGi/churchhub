@@ -5,6 +5,9 @@ async function main() {
   // 관리자 비밀번호 해시 생성
   const hashedPassword = await bcrypt.hash('admin123!', 10)
 
+  // Clear existing data
+  await prisma.church.deleteMany()
+
   // 데모 교회 데이터 생성
   const churches = await Promise.all([
     prisma.church.create({
@@ -62,6 +65,106 @@ async function main() {
         slug: 'minimal-church',
         name: '미니멀교회',
         description: '단순함 속의 진리',
+        theme: JSON.stringify({
+          colors: {
+            primary: '#333333',
+            secondary: '#666666',
+            accent: '#00bcd4',
+            background: '#ffffff',
+          },
+          font: 'sans-serif',
+          layout: 'minimal',
+        }),
+        modules: JSON.stringify({
+          sermon: true,
+          notice: false,
+          community: false,
+          gallery: false,
+          donation: false,
+        }),
+        plan: 'starter',
+      },
+    }),
+    prisma.church.create({
+      data: {
+        slug: 'demo',
+        name: '데모 교회',
+        description: '샘플 교회 페이지',
+        theme: JSON.stringify({
+          colors: {
+            primary: '#2d5aa0',
+            secondary: '#5ba3e0',
+            accent: '#ff6b6b',
+            background: '#ffffff',
+          },
+          font: 'sans-serif',
+          layout: 'modern',
+        }),
+        modules: JSON.stringify({
+          sermon: true,
+          notice: true,
+          community: true,
+          gallery: true,
+          donation: false,
+        }),
+        plan: 'starter',
+      },
+    }),
+    prisma.church.create({
+      data: {
+        slug: 'sae-church',
+        name: '새교회',
+        description: '따뜻한 공동체',
+        theme: JSON.stringify({
+          colors: {
+            primary: '#2d5aa0',
+            secondary: '#5ba3e0',
+            accent: '#ff6b6b',
+            background: '#ffffff',
+          },
+          font: 'sans-serif',
+          layout: 'modern',
+        }),
+        modules: JSON.stringify({
+          sermon: true,
+          notice: true,
+          community: true,
+          gallery: false,
+          donation: false,
+        }),
+        plan: 'basic',
+      },
+    }),
+    prisma.church.create({
+      data: {
+        slug: 'peace-church',
+        name: '평화교회',
+        description: '평화로운 예배',
+        theme: JSON.stringify({
+          colors: {
+            primary: '#1e3a5f',
+            secondary: '#8b7355',
+            accent: '#d4af37',
+            background: '#faf8f5',
+          },
+          font: 'serif',
+          layout: 'traditional',
+        }),
+        modules: JSON.stringify({
+          sermon: true,
+          notice: true,
+          community: true,
+          gallery: true,
+          donation: false,
+        }),
+        plan: 'basic',
+      },
+    }),
+    prisma.church.create({
+      data: {
+        slug: 'hope-church',
+        name: '소망교회',
+        description: '소망을 전하는 교회',
         theme: JSON.stringify({
           colors: {
             primary: '#333333',

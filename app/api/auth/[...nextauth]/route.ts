@@ -2,6 +2,13 @@ import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import { authRateLimit } from "@/lib/rate-limit"
+import { NextRequest } from "next/server"
+
+// Rate Limiting 체크
+async function checkRateLimit(req: NextRequest): Promise<Response | null> {
+  return authRateLimit(req)
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
