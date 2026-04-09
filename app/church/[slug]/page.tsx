@@ -57,24 +57,35 @@ export default async function ChurchPage({
 
   // 레이아웃에 따라 컴포넌트 선택
   const layout = theme.layout || 'modern'
+  const sections = (theme as { sections?: { hero: string; sermon: string; notice: string; footer: string } }).sections
 
   // 히어로 선택
-  const HeroComponent = layout === 'traditional' ? ImageHero
-    : layout === 'minimal' ? TextHero
+  const HeroComponent = (sections?.hero === 'image') ? ImageHero
+    : (sections?.hero === 'text') ? TextHero
+    : (layout === 'traditional') ? ImageHero
+    : (layout === 'minimal') ? TextHero
     : GradientHero
 
   // 설교 섹션 선택
-  const SermonComponent = layout === 'traditional' ? SermonList
-    : layout === 'minimal' ? SermonList
+  const SermonComponent = (sections?.sermon === 'list') ? SermonList
+    : (sections?.sermon === 'featured') ? SermonFeatured
+    : (sections?.sermon === 'cards') ? SermonCards
+    : (layout === 'traditional') ? SermonList
+    : (layout === 'minimal') ? SermonList
     : SermonCards
 
   // 공지 섹션 선택
-  const NoticeComponent = layout === 'traditional' ? NoticeTable
-    : layout === 'minimal' ? NoticeTimeline
+  const NoticeComponent = (sections?.notice === 'table') ? NoticeTable
+    : (sections?.notice === 'timeline') ? NoticeTimeline
+    : (sections?.notice === 'cards') ? NoticeCards
+    : (layout === 'traditional') ? NoticeTable
+    : (layout === 'minimal') ? NoticeTimeline
     : NoticeCards
 
   // 푸터 선택
-  const FooterComponent = layout === 'minimal' ? FooterMinimal : FooterFull
+  const FooterComponent = (sections?.footer === 'minimal') ? FooterMinimal
+    : (layout === 'minimal') ? FooterMinimal
+    : FooterFull
 
   // 미니멀 레이아웃은 사이드바 + 중앙 콘텐츠
   if (layout === 'minimal') {
