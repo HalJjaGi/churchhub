@@ -14,25 +14,35 @@ datasource db {
 }
 
 model Church {
-  id          String   @id @default(cuid())
-  slug        String   @unique // URL용 식별자 (예: my-church)
-  name        String
-  description String?
-  theme       String   // 테마 설정 (JSON string)
-  modules     String   // 활성화된 모듈 목록 (JSON string)
-  plan        String   @default("starter") // starter, basic, pro, enterprise
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  description   String?
+  theme         String
+  modules       String
+  plan          String   @default("starter")
   // 위치 및 연락처 정보
-  address     String?  // 주소
-  phone       String?  // 전화번호
-  email       String?  // 이메일
-  parking     String?  // 주차 안내
-  mapLat      Float?   // 지도 위도
-  mapLng      Float?   // 지도 경도
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  users       User[]
-  sermons     Sermon[]
-  notices     Notice[]
+  address       String?
+  phone         String?
+  email         String?
+  parking       String?
+  mapLat        Float?
+  mapLng        Float?
+  // 교회 소개
+  intro         String?   // 교회 소개 (긴 텍스트)
+  vision        String?   // 비전
+  history       String?   // 교회 역사
+  pastorName    String?   // 담임목사명
+  pastorMessage String?   // 담임목사 인사말
+  pastorImage   String?   // 담임목사 사진 URL
+  // 예배 시간 (JSON)
+  worshipTimes  String?   // 예배 시간 JSON
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  users         User[]
+  sermons       Sermon[]
+  notices       Notice[]
+  schedules     Schedule[]
 }
 
 model User {
@@ -65,6 +75,19 @@ model Notice {
   id          String   @id @default(cuid())
   title       String
   content     String
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Schedule {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime
+  endDate     DateTime?
+  category    String   @default("general") // general, worship, event, meeting, education
   churchId    String
   church      Church   @relation(fields: [churchId], references: [id])
   createdAt   DateTime @default(now())

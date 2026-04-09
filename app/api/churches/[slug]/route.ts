@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { requireAdminForSlug } from '@/lib/auth-guard'
+
+const SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
+
+// Super Admin 전용 체크
+async function requireSuperAdmin(request: NextRequest) {
+  const { getToken } = await import('next-auth/jwt')
+  const token = await getToken({ req: request, secret: SECRET })
+  if (!token || token.role !== 'super_admin') {
+    return NextResponse.json({ error: 'Super Admin 권한이 필요합니다.' }, { status: 403 })
+  }
+  return null
+}
 
 const colorSchema = z.string().regex(/^#[0-9a-fA-F]{3,8}$/, 'Invalid color format')
 
@@ -111,7 +122,7 @@ export async function PUT(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params
-  const { error: authError } = await requireAdminForSlug(request, slug)
+  const authError = await requireSuperAdmin(request)
   if (authError) return authError
   try {
     const body = await request.json()

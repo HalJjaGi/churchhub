@@ -105,12 +105,14 @@ export function rateLimit(config: RateLimitConfig) {
 
 /**
  * API Rate Limiter
- * - 일반 API: 100회/분
- * - 인증 API: 10회/분
+ * - 개발 모드: 제한 없음
+ * - 프로덕션: 일반 100회/분, 인증 10회/분
  */
+const isDev = process.env.NODE_ENV === 'development'
+
 export const apiRateLimit = rateLimit({
   windowMs: 60 * 1000,
-  max: 100,
+  max: isDev ? 100000 : 100,
 })
 
 export const authRateLimit = rateLimit({

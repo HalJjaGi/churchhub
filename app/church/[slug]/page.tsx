@@ -15,6 +15,8 @@ import { NoticeTimeline } from '@/components/church/NoticeSection/NoticeTimeline
 import { ContactClassic } from '@/components/church/ContactSection/ContactClassic'
 import { FooterFull } from '@/components/church/Footer/FooterFull'
 import { FooterMinimal } from '@/components/church/Footer/FooterMinimal'
+import { WorshipSchedule } from '@/components/church/WorshipSchedule/WorshipSchedule'
+import { ScheduleList } from '@/components/church/ScheduleSection/ScheduleList'
 import Link from 'next/link'
 
 export default async function ChurchPage({
@@ -29,6 +31,7 @@ export default async function ChurchPage({
     include: {
       sermons: { orderBy: { date: 'desc' }, take: 6 },
       notices: { orderBy: { createdAt: 'desc' }, take: 5 },
+      schedules: { orderBy: { date: 'asc' }, take: 10 },
     },
   })
 
@@ -104,12 +107,14 @@ export default async function ChurchPage({
           <HeroComponent theme={theme} churchName={church.name} description={church.description} />
 
           <main className="max-w-3xl mx-auto px-4 py-12 sm:px-6 lg:px-8 space-y-12">
+            <WorshipSchedule theme={theme} worshipTimes={church.worshipTimes} />
             {modules.sermon && (
               <SermonComponent theme={theme} sermons={churchData.sermons} churchSlug={church.slug} />
             )}
             {modules.notice && (
               <NoticeComponent theme={theme} notices={churchData.notices} />
             )}
+            <ScheduleList theme={theme} schedules={church.schedules} />
             <ContactClassic theme={theme} church={churchData} />
           </main>
 
@@ -138,6 +143,8 @@ export default async function ChurchPage({
         style={{ backgroundColor: 'var(--color-background)' }}
         className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 space-y-12"
       >
+        <WorshipSchedule theme={theme} worshipTimes={church.worshipTimes} />
+
         {layout === 'modern' && modules.sermon && church.sermons.length > 0 ? (
           // 모던: 피처드 설교 + 카드
           <>
@@ -158,6 +165,7 @@ export default async function ChurchPage({
           </div>
         )}
 
+        <ScheduleList theme={theme} schedules={church.schedules} />
         <ContactClassic theme={theme} church={churchData} />
       </main>
 

@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next()
     }
 
-    // Church Admin → 자기 교회만 관리 가능
+    // Church Admin → 자기 교회만 관리 가능 (제한된 경로만)
     if (role === 'church_admin') {
       const churchId = token.churchId as string | undefined
       
@@ -40,19 +40,38 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url))
       }
 
-      // URL에서 slug 추출: /admin/[slug]/...
+      // church_admin 접근 가능 경로
+      const allowedPaths = [
+        /^\/admin\/([^/]+)$/,           // /admin/[slug] (메인)
+        /^\/admin\/([^/]+)\/sermons/,   // /admin/[slug]/sermons/*
+        /^\/admin\/([^/]+)\/notices/,   // /admin/[slug]/notices/*
+      ]
+      
+      const isAllowed = allowedPaths.some(pattern => pattern.test(pathname))
+      
+      if (!isAllowed) {
+        // 허용되지 않은 경로 → 자기 교회 메인으로 리다이렉트
+        const userChurch = await prisma.church.findUnique({
+          where: { id: churchId },
+          select: { slug: true },
+        })
+        if (userChurch) {
+          return NextResponse.redirect(new URL(`/admin/${userChurch.slug}`, request.url))
+        }
+        return NextResponse.redirect(new URL('/login', request.url))
+      }
+
+      // URL에서 slug 추출
       const slugMatch = pathname.match(/^\/admin\/([^/]+)/)
       if (slugMatch) {
         const slug = slugMatch[1]
         
-        // DB에서 slug로 교회 조회해서 churchId 비교
         const church = await prisma.church.findUnique({ 
           where: { slug },
           select: { id: true } 
         })
         
         if (!church || church.id !== churchId) {
-          // 자기 교회가 아니면 자기 교회 관리 페이지로 리다이렉트
           const userChurch = await prisma.church.findUnique({
             where: { id: churchId },
             select: { slug: true },
