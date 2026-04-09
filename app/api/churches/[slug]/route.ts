@@ -5,6 +5,13 @@ import { requireAdminForSlug } from '@/lib/auth-guard'
 
 const colorSchema = z.string().regex(/^#[0-9a-fA-F]{3,8}$/, 'Invalid color format')
 
+const sectionsSchema = z.object({
+  hero: z.enum(['image', 'gradient', 'text']),
+  sermon: z.enum(['list', 'cards', 'featured']),
+  notice: z.enum(['table', 'cards', 'timeline']),
+  footer: z.enum(['full', 'minimal']),
+})
+
 const themeSchema = z.object({
   colors: z.object({
     primary: colorSchema,
@@ -14,6 +21,7 @@ const themeSchema = z.object({
   }),
   font: z.enum(['serif', 'sans-serif']),
   layout: z.enum(['traditional', 'modern', 'minimal']),
+  sections: sectionsSchema.optional(),
 })
 
 const modulesSchema = z.object({
