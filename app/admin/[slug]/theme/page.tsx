@@ -169,11 +169,13 @@ export default function ThemeSettingsPage() {
         {/* 프리셋 */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">🎨 프리셋 테마</h2>
-          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             {[
-              { name: 'Grace', desc: '우아한 전통', layout: 'traditional' as const, primary: '#1e3a5f', accent: '#d4af37', font: 'serif' as const },
-              { name: 'Joy', desc: '밝고 활기찬', layout: 'modern' as const, primary: '#2d5aa0', accent: '#ff6b6b', font: 'sans-serif' as const },
-              { name: 'Peace', desc: '차분한 미니멀', layout: 'minimal' as const, primary: '#333333', accent: '#00bcd4', font: 'sans-serif' as const },
+              { name: 'Grace', desc: '우아한 전통', layout: 'traditional' as const, primary: '#1e3a5f', secondary: '#8b7355', accent: '#d4af37', background: '#faf8f5', font: 'serif' as const },
+              { name: 'Joy', desc: '밝고 활기찬', layout: 'modern' as const, primary: '#2d5aa0', secondary: '#5ba3e0', accent: '#ff6b6b', background: '#ffffff', font: 'sans-serif' as const },
+              { name: 'Peace', desc: '차분한 미니멀', layout: 'minimal' as const, primary: '#333333', secondary: '#666666', accent: '#00bcd4', background: '#ffffff', font: 'sans-serif' as const },
+              { name: 'Glory', desc: '웅장한 예배', layout: 'traditional' as const, primary: '#4a1a6b', secondary: '#7b3fa0', accent: '#ffd700', background: '#1a1a2e', font: 'serif' as const },
+              { name: 'Light', desc: '깔끔한 모던', layout: 'modern' as const, primary: '#0ea5e9', secondary: '#38bdf8', accent: '#f97316', background: '#f8fafc', font: 'sans-serif' as const },
             ].map((preset) => (
               <button
                 key={preset.name}
@@ -185,9 +187,9 @@ export default function ThemeSettingsPage() {
                     font: preset.font,
                     colors: {
                       primary: preset.primary,
-                      secondary: theme.colors.secondary,
+                      secondary: preset.secondary,
                       accent: preset.accent,
-                      background: theme.colors.background,
+                      background: preset.background,
                     },
                     sections: {
                       hero: preset.layout === 'traditional' ? 'image' : preset.layout === 'minimal' ? 'text' : 'gradient',
@@ -318,25 +320,125 @@ export default function ThemeSettingsPage() {
           </div>
         </div>
 
-        {/* 미리보기 */}
+        {/* 실시간 미리보기 */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">👁️ 색상 미리보기</h2>
-          <div className="rounded-lg overflow-hidden border">
-            <div className="p-6 text-white" style={{ backgroundColor: theme.colors.primary }}>
-              <h3 className="text-xl font-bold mb-1" style={{ fontFamily: theme.font === 'serif' ? 'Georgia, serif' : 'system-ui' }}>
-                교회명 미리보기
-              </h3>
-              <p className="text-sm opacity-80">설명 텍스트</p>
-            </div>
-            <div className="p-4" style={{ backgroundColor: theme.colors.background }}>
-              <div className="flex gap-2 mb-3">
-                <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: theme.colors.accent, color: '#fff' }}>강조</span>
-                <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: theme.colors.secondary, color: '#fff' }}>보조</span>
-              </div>
-              <div className="h-2 rounded-full w-48" style={{ backgroundColor: theme.colors.secondary + '30' }}>
-                <div className="h-2 rounded-full w-24" style={{ backgroundColor: theme.colors.accent }} />
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">👁️ 실시간 미리보기</h2>
+          <div className="rounded-lg overflow-hidden border shadow-sm">
+            {/* 네비게이션 */}
+            <div className="px-6 py-3 flex justify-between items-center text-white text-sm" style={{ backgroundColor: theme.colors.primary }}>
+              <span className="font-bold" style={{ fontFamily: theme.font === 'serif' ? 'Georgia, serif' : 'system-ui' }}>교회명</span>
+              <div className="flex gap-3 opacity-80">
+                <span>홈</span><span>설교</span><span>공지</span><span>연락처</span>
               </div>
             </div>
+
+            {/* 히어로 */}
+            {sections.hero === 'gradient' ? (
+              <div className="px-6 py-12 text-white text-center" style={{ background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary}, ${theme.colors.accent})` }}>
+                <h3 className="text-2xl font-bold mb-1" style={{ fontFamily: theme.font === 'serif' ? 'Georgia, serif' : 'system-ui' }}>교회명 미리보기</h3>
+                <p className="text-sm opacity-80">교회 설명 텍스트</p>
+              </div>
+            ) : sections.hero === 'text' ? (
+              <div className="px-6 py-12 text-center">
+                <h3 className="text-3xl font-bold mb-2" style={{ color: theme.colors.primary, fontFamily: theme.font === 'serif' ? 'Georgia, serif' : 'system-ui' }}>교회명 미리보기</h3>
+                <p className="text-sm text-gray-500">교회 설명 텍스트</p>
+                <div className="w-12 h-0.5 mx-auto mt-4" style={{ backgroundColor: theme.colors.accent }} />
+              </div>
+            ) : (
+              <div className="px-6 py-12 text-white relative" style={{ backgroundColor: theme.colors.primary }}>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent" />
+                <div className="relative text-center">
+                  <h3 className="text-2xl font-bold mb-1" style={{ fontFamily: theme.font === 'serif' ? 'Georgia, serif' : 'system-ui' }}>교회명 미리보기</h3>
+                  <p className="text-sm opacity-80">교회 설명 텍스트</p>
+                </div>
+              </div>
+            )}
+
+            {/* 본문 */}
+            <div className="p-6 space-y-4" style={{ backgroundColor: theme.colors.background }}>
+              {/* 설교 미리보기 */}
+              <div>
+                <h4 className="text-sm font-bold mb-2" style={{ color: theme.colors.primary }}>
+                  {sections.sermon === 'featured' ? '⭐ 이번 주 설교' : '최근 설교'}
+                </h4>
+                {sections.sermon === 'cards' ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    {[1,2,3].map(i => (
+                      <div key={i} className="rounded border overflow-hidden">
+                        <div className="h-8 bg-gray-200" />
+                        <div className="p-1.5">
+                          <div className="h-2 w-full rounded bg-gray-300 mb-1" />
+                          <div className="h-1.5 w-2/3 rounded bg-gray-200" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : sections.sermon === 'featured' ? (
+                  <div className="rounded-lg overflow-hidden" style={{ backgroundColor: theme.colors.primary }}>
+                    <div className="p-3 text-white">
+                      <div className="h-2 w-3/4 rounded bg-white/30 mb-1" />
+                      <div className="h-1.5 w-1/2 rounded bg-white/20" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {[1,2,3].map(i => (
+                      <div key={i} className="flex items-center gap-2">
+                        <div className="h-1.5 flex-1 rounded bg-gray-200" />
+                        <div className="h-1.5 w-12 rounded bg-gray-100" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 공지 미리보기 */}
+              <div>
+                <h4 className="text-sm font-bold mb-2" style={{ color: theme.colors.primary }}>공지사항</h4>
+                {sections.notice === 'cards' ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    {[1,2].map(i => (
+                      <div key={i} className="rounded border p-2" style={{ borderLeftWidth: 3, borderLeftColor: theme.colors.accent }}>
+                        <div className="h-2 w-3/4 rounded bg-gray-200 mb-1" />
+                        <div className="h-1.5 w-full rounded bg-gray-100" />
+                      </div>
+                    ))}
+                  </div>
+                ) : sections.notice === 'timeline' ? (
+                  <div className="relative pl-6">
+                    <div className="absolute left-1.5 top-0 bottom-0 w-px" style={{ backgroundColor: theme.colors.secondary + '40' }} />
+                    {[1,2].map(i => (
+                      <div key={i} className="relative mb-2">
+                        <div className="absolute -left-6 top-1 w-3 h-3 rounded-full border-2 bg-white" style={{ borderColor: theme.colors.accent }} />
+                        <div className="h-2 w-3/4 rounded bg-gray-200 mb-0.5" />
+                        <div className="h-1.5 w-full rounded bg-gray-100" />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {[1,2].map(i => (
+                      <div key={i}>
+                        <div className="h-2 w-2/3 rounded bg-gray-200 mb-0.5" />
+                        <div className="h-1.5 w-full rounded bg-gray-100" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 푸터 */}
+            {sections.footer === 'full' ? (
+              <div className="px-4 py-3 text-white text-center text-xs" style={{ backgroundColor: theme.colors.primary }}>
+                <p className="font-medium mb-0.5">교회명</p>
+                <p className="opacity-60">© 2026 All rights reserved.</p>
+              </div>
+            ) : (
+              <div className="px-4 py-2 text-center text-xs text-gray-400">
+                © 2026 교회명
+              </div>
+            )}
           </div>
         </div>
       </main>
