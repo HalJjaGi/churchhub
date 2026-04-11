@@ -14,7 +14,7 @@ export default async function HomePage() {
   })
 
   return (
-    <div className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white">
         <div className="absolute inset-0 opacity-10">
@@ -213,6 +213,6 @@ export default async function HomePage() {
           </div>
         </div>
       </footer>
-    </div>
+    </main>
   )
 }
