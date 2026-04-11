@@ -1,211 +1,216 @@
-'use client'
-
-import { useState } from 'react'
 import Link from 'next/link'
+import { prisma } from '@/lib/prisma'
 
-export default function Home() {
-  const [activeTab, setActiveTab] = useState<'theme' | 'module'>('theme')
-  const [selectedTheme, setSelectedTheme] = useState('modern')
-  const [modules, setModules] = useState({
-    sermon: true,
-    calendar: true,
-    gallery: false,
-    contact: true,
-    announcements: true,
+export default async function HomePage() {
+  const churches = await prisma.church.findMany({
+    select: {
+      slug: true,
+      name: true,
+      description: true,
+      address: true,
+      theme: true,
+    },
+    orderBy: { createdAt: 'desc' },
   })
 
-  const themes = [
-    { id: 'traditional', name: '전통', color: '#8B4513' },
-    { id: 'modern', name: '모던', color: '#2d5aa0' },
-    { id: 'minimal', name: '미니멀', color: '#333333' },
-  ]
-
-  const moduleList = [
-    { id: 'sermon', name: '설교', description: '설교 영상' },
-    { id: 'announcements', name: '공지사항', description: '교회 공지' },
-    { id: 'calendar', name: '캘린더', description: '교회 일정' },
-    { id: 'gallery', name: '갤러리', description: '사진 갤러리' },
-    { id: 'contact', name: '오시는 길', description: '연락처' },
-  ]
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold text-gray-900">🙏 ChurchHub</h1>
-            <nav className="flex gap-4">
-              <Link href="/admin" className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">
-                관리자
-              </Link>
-            </nav>
-          </div>
+    <div className="min-h-screen bg-white">
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
+          <div className="absolute bottom-10 right-20 w-96 h-96 bg-blue-300 rounded-full blur-3xl" />
         </div>
-      </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">교회 웹사이트를 쉽게 만드세요</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            ChurchHub은 교회를 위한 웹사이트 플랫폼입니다. 전통적이거나 현대적인 디자인으로 교회의 특성에 맞는 웹사이트를 만들 수 있습니다.
+        <nav className="relative max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+          <Link href="/" className="text-2xl font-bold tracking-tight">
+            🙏 ChurchHub
+          </Link>
+          <div className="flex gap-3">
+            <Link
+              href="/login"
+              className="px-4 py-2 text-sm font-medium text-white/90 hover:text-white transition"
+            >
+              로그인
+            </Link>
+            <Link
+              href="/admin"
+              className="px-4 py-2 text-sm font-medium bg-white/10 rounded-lg hover:bg-white/20 transition"
+            >
+              관리자
+            </Link>
+          </div>
+        </nav>
+
+        <div className="relative max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6">
+            교회 웹사이트를<br className="hidden sm:block" /> 쉽게 만드세요
+          </h1>
+          <p className="text-lg sm:text-xl text-blue-100 max-w-2xl mx-auto mb-10">
+            ChurchHub으로 전문적인 교회 웹사이트를 몇 분 만에 구축하세요.
+            설교, 공지사항, 일정 관리까지 올인원.
           </p>
-        </div>
-
-        {/* 탭 UI */}
-        <div className="mb-8">
-          <div className="flex border-b">
-            <button
-              onClick={() => setActiveTab('theme')}
-              className={`px-6 py-3 font-medium ${
-                activeTab === 'theme'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/admin/churches/new"
+              className="inline-flex items-center justify-center px-8 py-3 bg-white text-blue-700 font-semibold rounded-xl hover:bg-blue-50 transition shadow-lg"
             >
-              테마 선택
-            </button>
-            <button
-              onClick={() => setActiveTab('module')}
-              className={`px-6 py-3 font-medium ${
-                activeTab === 'module'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              모듈 관리
-            </button>
+              무료로 시작하기
+            </Link>
+            {churches.length > 0 && (
+              <a
+                href="#churches"
+                className="inline-flex items-center justify-center px-8 py-3 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition border border-white/20"
+              >
+                교회 둘러보기 ↓
+              </a>
+            )}
           </div>
         </div>
+      </section>
 
-        {/* 테마 선택 탭 */}
-        {activeTab === 'theme' && (
-          <>
-            {/* 현재 선택된 테마 표시 */}
-            <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-gray-600">
-                현재 선택된 테마: <span className="font-semibold text-blue-600">
-                  {themes.find(t => t.id === selectedTheme)?.name}
-                </span>
-              </p>
-            </div>
+      {/* Features */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              교회에 필요한 모든 기능
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              웹사이트 하나로 교회 소식을 전하고, 성도들과 소통하세요.
+            </p>
+          </div>
 
-            <div className="grid gap-6 md:grid-cols-3 mb-12">
-              {themes.map((theme) => (
-                <div
-                  key={theme.id}
-                  onClick={() => setSelectedTheme(theme.id)}
-                  className={`cursor-pointer border-2 rounded-lg p-6 transition ${
-                    selectedTheme === theme.id
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div
-                    className="w-full h-32 rounded mb-4"
-                    style={{ backgroundColor: theme.color }}
-                  />
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-semibold text-lg">{theme.name}</h3>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setSelectedTheme(theme.id)
-                      }}
-                      className="px-3 py-1 text-sm border rounded hover:bg-gray-50"
-                    >
-                      선택
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* 모듈 관리 탭 */}
-        {activeTab === 'module' && (
-          <div className="space-y-4 mb-12">
-            {moduleList.map((module) => (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: '📖',
+                title: '설교 관리',
+                desc: '설교 영상과 본문을 등록하고, 성도들에게 말씀을 전달하세요.',
+              },
+              {
+                icon: '📢',
+                title: '공지사항',
+                desc: '교회 소식과 행사 안내를 쉽게 등록하고 공유하세요.',
+              },
+              {
+                icon: '📅',
+                title: '교회 일정',
+                desc: '예배, 모임, 행사 일정을 한눈에 관리하세요.',
+              },
+              {
+                icon: '🎨',
+                title: '맞춤 테마',
+                desc: '전통, 모던, 미니멀 — 교회 분위기에 맞는 디자인을 선택하세요.',
+              },
+              {
+                icon: '📍',
+                title: '오시는 길',
+                desc: '주소, 연락처, 주차 안내로 처음 오시는 분도 쉽게 찾을 수 있습니다.',
+              },
+              {
+                icon: '🔐',
+                title: '권한 관리',
+                desc: '슈퍼 관리자, 교회 관리자, 에디터 — 역할별로 권한을 나누세요.',
+              },
+            ].map((feature) => (
               <div
-                key={module.id}
-                className="flex items-center justify-between p-4 bg-white border rounded-lg"
+                key={feature.title}
+                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
               >
-                <div>
-                  <h3 className="font-semibold">{module.name}</h3>
-                  <p className="text-sm text-gray-600">{module.description}</p>
-                </div>
-                <button
-                  onClick={() =>
-                    setModules((prev) => ({
-                      ...prev,
-                      [module.id]: !prev[module.id as keyof typeof prev],
-                    }))
-                  }
-                  className={`relative w-12 h-6 rounded-full transition ${
-                    modules[module.id as keyof typeof modules]
-                      ? 'bg-blue-600'
-                      : 'bg-gray-300'
-                  }`}
-                  role="switch"
-                  aria-checked={modules[module.id as keyof typeof modules]}
-                >
-                  <span
-                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition ${
-                      modules[module.id as keyof typeof modules]
-                        ? 'left-7'
-                        : 'left-1'
-                    }`}
-                  />
-                </button>
+                <div className="text-3xl mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
-        )}
+        </div>
+      </section>
 
-        {/* 교회 카드 */}
-        <h3 className="text-2xl font-bold mb-6">미리보기</h3>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Link
-            href="/church/demo"
-            className="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
-          >
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">데모 교회</h3>
-            <p className="text-gray-600 mb-4">샘플 교회 페이지</p>
-            <span className="text-blue-600 hover:text-blue-800">미리보기 →</span>
-          </Link>
+      {/* Churches */}
+      {churches.length > 0 && (
+        <section id="churches" className="py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                등록된 교회
+              </h2>
+              <p className="text-lg text-gray-600">
+                {churches.length}개 교회가 ChurchHub과 함께하고 있습니다
+              </p>
+            </div>
 
-          <Link
-            href="/church/sae-church"
-            className="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
-          >
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">새교회</h3>
-            <p className="text-gray-600 mb-4">따뜻한 공동체</p>
-            <span className="text-blue-600 hover:text-blue-800">방문하기 →</span>
-          </Link>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {churches.map((church) => {
+                let colors = { primary: '#2563eb' }
+                try {
+                  const theme = JSON.parse(church.theme || '{}')
+                  colors = theme.colors || colors
+                } catch { /* ignore */ }
 
-          <Link
-            href="/church/peace-church"
-            className="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
-          >
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">평화교회</h3>
-            <p className="text-gray-600 mb-4">평화로운 예배</p>
-            <span className="text-blue-600 hover:text-blue-800">방문하기 →</span>
-          </Link>
+                return (
+                  <Link
+                    key={church.slug}
+                    href={`/church/${church.slug}`}
+                    className="group block bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all hover:-translate-y-0.5"
+                  >
+                    <div
+                      className="h-3"
+                      style={{ backgroundColor: colors.primary }}
+                    />
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition">
+                        {church.name}
+                      </h3>
+                      {church.description && (
+                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                          {church.description}
+                        </p>
+                      )}
+                      {church.address && (
+                        <p className="text-gray-400 text-xs flex items-center gap-1">
+                          <span>📍</span> {church.address}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
+      {/* CTA */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            지금 시작하세요
+          </h2>
+          <p className="text-lg text-blue-100 mb-10 max-w-2xl mx-auto">
+            교회 웹사이트가 필요하신가요? ChurchHub에서 무료로 만들 수 있습니다.
+          </p>
           <Link
-            href="/church/hope-church"
-            className="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
+            href="/admin/churches/new"
+            className="inline-flex items-center justify-center px-8 py-3 bg-white text-blue-700 font-semibold rounded-xl hover:bg-blue-50 transition shadow-lg"
           >
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">소망교회</h3>
-            <p className="text-gray-600 mb-4">소망을 전하는 교회</p>
-            <span className="text-blue-600 hover:text-blue-800">방문하기 →</span>
+            교회 등록하기
           </Link>
         </div>
-      </main>
+      </section>
 
-      <footer className="bg-white border-t mt-12">
-        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-500 text-sm">© 2026 ChurchHub. All rights reserved.</p>
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-400 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">🙏</span>
+              <span className="text-white font-bold">ChurchHub</span>
+            </div>
+            <p className="text-sm">© 2026 ChurchHub. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>

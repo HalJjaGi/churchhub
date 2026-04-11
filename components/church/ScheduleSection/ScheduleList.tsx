@@ -12,6 +12,7 @@ type Schedule = {
 type Props = {
   theme: Theme
   schedules: Schedule[]
+  churchSlug?: string
 }
 
 const categoryConfig: Record<string, { icon: string; bg: string; text: string }> = {
@@ -22,7 +23,7 @@ const categoryConfig: Record<string, { icon: string; bg: string; text: string }>
   general: { icon: '📌', bg: 'bg-gray-100', text: 'text-gray-700' },
 }
 
-export function ScheduleList({ theme, schedules }: Props) {
+export function ScheduleList({ theme, schedules, churchSlug }: Props) {
   const now = new Date()
   const upcoming = schedules
     .filter((s) => new Date(s.date) >= now)
@@ -32,12 +33,23 @@ export function ScheduleList({ theme, schedules }: Props) {
 
   return (
     <section>
-      <h2
-        className="text-2xl font-bold mb-6"
-        style={{ color: theme.colors.primary }}
-      >
-        📅 다가오는 일정
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2
+          className="text-2xl font-bold"
+          style={{ color: theme.colors.primary }}
+        >
+          📅 다가오는 일정
+        </h2>
+        {churchSlug && (
+          <a
+            href={`/church/${churchSlug}/calendar`}
+            className="text-sm font-medium hover:underline"
+            style={{ color: theme.colors.primary }}
+          >
+            전체 일정 보기 →
+          </a>
+        )}
+      </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {upcoming.map((schedule) => {
           const config = categoryConfig[schedule.category] || categoryConfig.general

@@ -3,9 +3,10 @@ import type { Theme, Notice } from '../types'
 type NoticeSectionProps = {
   theme: Theme
   notices: Notice[]
+  churchSlug?: string
 }
 
-export function NoticeTimeline({ theme, notices }: NoticeSectionProps) {
+export function NoticeTimeline({ theme, notices, churchSlug }: NoticeSectionProps) {
   if (notices.length === 0) return null
 
   return (
@@ -24,7 +25,11 @@ export function NoticeTimeline({ theme, notices }: NoticeSectionProps) {
         />
         <div className="space-y-6">
           {notices.map((notice) => (
-            <div key={notice.id} className="relative pl-12">
+            <a
+              key={notice.id}
+              href={churchSlug ? `/church/${churchSlug}/notices/${notice.id}` : undefined}
+              className="block relative pl-12"
+            >
               {/* 타임라인 점 */}
               <div
                 className="absolute left-2 top-1 w-5 h-5 rounded-full border-2 bg-white"
@@ -45,7 +50,7 @@ export function NoticeTimeline({ theme, notices }: NoticeSectionProps) {
                 <h3 className="font-semibold text-gray-900">{notice.title}</h3>
                 <p className="text-sm text-gray-600 mt-1">{notice.content}</p>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </div>

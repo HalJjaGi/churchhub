@@ -17,6 +17,7 @@ import { FooterFull } from '@/components/church/Footer/FooterFull'
 import { FooterMinimal } from '@/components/church/Footer/FooterMinimal'
 import { WorshipSchedule } from '@/components/church/WorshipSchedule/WorshipSchedule'
 import { ScheduleList } from '@/components/church/ScheduleSection/ScheduleList'
+import { GalleryGrid } from '@/components/church/GallerySection/GalleryGrid'
 import Link from 'next/link'
 
 export default async function ChurchPage({
@@ -32,6 +33,7 @@ export default async function ChurchPage({
       sermons: { orderBy: { date: 'desc' }, take: 6 },
       notices: { orderBy: { createdAt: 'desc' }, take: 5 },
       schedules: { orderBy: { date: 'asc' }, take: 10 },
+      galleries: { orderBy: { createdAt: 'desc' }, take: 6 },
     },
   })
 
@@ -112,9 +114,12 @@ export default async function ChurchPage({
               <SermonComponent theme={theme} sermons={churchData.sermons} churchSlug={church.slug} />
             )}
             {modules.notice && (
-              <NoticeComponent theme={theme} notices={churchData.notices} />
+              <NoticeComponent theme={theme} notices={churchData.notices} churchSlug={church.slug} />
             )}
-            <ScheduleList theme={theme} schedules={church.schedules} />
+            <ScheduleList theme={theme} schedules={church.schedules} churchSlug={church.slug} />
+            {modules.gallery && church.galleries.length > 0 && (
+              <GalleryGrid theme={theme} galleries={church.galleries} churchSlug={church.slug} />
+            )}
             <ContactClassic theme={theme} church={churchData} />
           </main>
 
@@ -150,7 +155,7 @@ export default async function ChurchPage({
           <>
             <SermonFeatured theme={theme} sermons={churchData.sermons} />
             {modules.notice && (
-              <NoticeComponent theme={theme} notices={churchData.notices} />
+              <NoticeComponent theme={theme} notices={churchData.notices} churchSlug={church.slug} />
             )}
           </>
         ) : (
@@ -160,12 +165,15 @@ export default async function ChurchPage({
               <SermonComponent theme={theme} sermons={churchData.sermons} churchSlug={church.slug} />
             )}
             {modules.notice && (
-              <NoticeComponent theme={theme} notices={churchData.notices} />
+              <NoticeComponent theme={theme} notices={churchData.notices} churchSlug={church.slug} />
             )}
           </div>
         )}
 
-        <ScheduleList theme={theme} schedules={church.schedules} />
+        <ScheduleList theme={theme} schedules={church.schedules} churchSlug={church.slug} />
+        {modules.gallery && church.galleries.length > 0 && (
+          <GalleryGrid theme={theme} galleries={church.galleries} churchSlug={church.slug} />
+        )}
         <ContactClassic theme={theme} church={churchData} />
       </main>
 

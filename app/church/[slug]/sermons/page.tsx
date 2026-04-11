@@ -43,16 +43,26 @@ export default async function SermonsPage({ params }: Props) {
         ) : (
           <div className="space-y-6">
             {church.sermons.map((sermon) => (
-              <article
+              <a
                 key={sermon.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                href={`/church/${slug}/sermons/${sermon.id}`}
+                className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
+                {sermon.thumbnail && (
+                  <div className="w-full h-48 bg-gray-200 overflow-hidden">
+                    <img
+                      src={sermon.thumbnail}
+                      alt={sermon.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-2">
                     <h2 className="text-xl font-semibold text-gray-900">
                       {sermon.title}
                     </h2>
-                    <time className="text-sm text-gray-500">
+                    <time className="text-sm text-gray-500 whitespace-nowrap ml-4">
                       {new Date(sermon.date).toLocaleDateString('ko-KR', {
                         year: 'numeric',
                         month: 'long',
@@ -68,8 +78,13 @@ export default async function SermonsPage({ params }: Props) {
                       {sermon.content}
                     </p>
                   )}
+                  {sermon.youtubeUrl && (
+                    <span className="inline-flex items-center gap-1 mt-2 text-xs text-red-600 font-medium">
+                      🎬 영상 보기
+                    </span>
+                  )}
                 </div>
-              </article>
+              </a>
             ))}
           </div>
         )}

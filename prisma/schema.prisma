@@ -43,6 +43,8 @@ model Church {
   sermons       Sermon[]
   notices       Notice[]
   schedules     Schedule[]
+  galleries     Gallery[]
+  posts         Post[]
 }
 
 model User {
@@ -90,6 +92,42 @@ model Schedule {
   category    String   @default("general") // general, worship, event, meeting, education
   churchId    String
   church      Church   @relation(fields: [churchId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Gallery {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String
+  category    String?   // worship, event, community 등
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  category    String    @default("general") // general, question, testimony, prayer, share
+  pinned      Boolean   @default(false)
+  authorName  String?
+  churchId    String
+  church      Church    @relation(fields: [churchId], references: [id])
+  comments    Comment[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  content     String
+  authorName  String?
+  postId      String
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

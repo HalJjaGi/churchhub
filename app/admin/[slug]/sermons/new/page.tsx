@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ImageUpload } from '@/components/ImageUpload'
 
 export default function NewSermonPage() {
   const params = useParams()
@@ -15,6 +16,7 @@ export default function NewSermonPage() {
     speaker: '',
     date: '',
     youtubeUrl: '',
+    thumbnail: '',
   })
   const [churchId, setChurchId] = useState('')
   const [loading, setLoading] = useState(false)
@@ -50,6 +52,7 @@ export default function NewSermonPage() {
           churchId,
           date: form.date || undefined,
           youtubeUrl: form.youtubeUrl || undefined,
+          thumbnail: form.thumbnail || undefined,
         }),
       })
 
@@ -153,10 +156,13 @@ export default function NewSermonPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="https://www.youtube.com/watch?v=..."
             />
-            <p className="mt-1 text-sm text-gray-500">
-              YouTube URL을 입력하면 썸네일이 자동으로 추출됩니다.
-            </p>
           </div>
+
+          <ImageUpload
+            label="썸네일 이미지"
+            value={form.thumbnail}
+            onChange={(url) => setForm({ ...form, thumbnail: url })}
+          />
 
           <div className="flex gap-4 pt-4">
             <Link

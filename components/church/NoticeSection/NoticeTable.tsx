@@ -3,9 +3,10 @@ import type { Theme, Notice } from '../types'
 type NoticeSectionProps = {
   theme: Theme
   notices: Notice[]
+  churchSlug?: string
 }
 
-export function NoticeTable({ theme, notices }: NoticeSectionProps) {
+export function NoticeTable({ theme, notices, churchSlug }: NoticeSectionProps) {
   if (notices.length === 0) return null
 
   return (
@@ -18,13 +19,17 @@ export function NoticeTable({ theme, notices }: NoticeSectionProps) {
       </h2>
       <div className="divide-y">
         {notices.map((notice) => (
-          <div key={notice.id} className="py-4 first:pt-0 last:pb-0">
+          <a
+            key={notice.id}
+            href={churchSlug ? `/church/${churchSlug}/notices/${notice.id}` : undefined}
+            className="block py-4 first:pt-0 last:pb-0 hover:bg-gray-50 px-2 -mx-2 rounded transition"
+          >
             <h3 className="font-semibold text-gray-900">{notice.title}</h3>
             <p className="text-sm text-gray-600 mt-1">{notice.content}</p>
             <p className="text-xs text-gray-400 mt-2">
               {new Date(notice.createdAt).toLocaleDateString('ko-KR')}
             </p>
-          </div>
+          </a>
         ))}
       </div>
     </section>
