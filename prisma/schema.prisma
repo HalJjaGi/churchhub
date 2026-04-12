@@ -49,6 +49,7 @@ model Church {
   schedules     Schedule[]
   galleries     Gallery[]
   posts         Post[]
+  boards        Board[]
 }
 
 model User {
@@ -81,6 +82,8 @@ model Notice {
   id          String   @id @default(cuid())
   title       String
   content     String
+  imageUrl    String?   // 첨부 이미지
+  pinned      Boolean   @default(false)
   churchId    String
   church      Church   @relation(fields: [churchId], references: [id])
   createdAt   DateTime @default(now())
@@ -116,9 +119,12 @@ model Post {
   id          String    @id @default(cuid())
   title       String
   content     String
-  category    String    @default("general") // general, question, testimony, prayer, share
+  imageUrl    String?    // 첨부 이미지
+  category    String    @default("general")
   pinned      Boolean   @default(false)
   authorName  String?
+  boardId     String?
+  board       Board?    @relation(fields: [boardId], references: [id], onDelete: SetNull)
   churchId    String
   church      Church    @relation(fields: [churchId], references: [id])
   comments    Comment[]
@@ -134,4 +140,21 @@ model Comment {
   post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Board {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String
+  description String?
+  icon        String?   // 이모지
+  order       Int      @default(0)
+  allowWrite  String   @default("all") // all, admin_only, closed
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id])
+  posts       Post[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([churchId, slug])
 }
