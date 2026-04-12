@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import GalleryClient from './GalleryClient'
 
@@ -12,9 +11,7 @@ export default async function GalleryPage({
 
   const church = await prisma.church.findUnique({
     where: { slug },
-    include: {
-      galleries: { orderBy: { createdAt: 'desc' } },
-    },
+    select: { id: true, name: true, theme: true },
   })
 
   if (!church) notFound()

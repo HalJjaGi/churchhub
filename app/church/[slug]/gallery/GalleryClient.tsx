@@ -15,21 +15,29 @@ type Gallery = {
 type Props = {
   church: {
     name: string
-    galleries: Gallery[]
+    id: string
   }
   colors: { primary: string }
   slug: string
 }
 
 export default function GalleryClient({ church, colors, slug }: Props) {
+  const [galleries, setGalleries] = useState<Gallery[]>([])
+  const [categories, setCategories] = useState<{id:string; name:string; slug:string; icon:string|null; color:string|null}[]>([])
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [lightbox, setLightbox] = useState<{ images: Gallery[]; index: number } | null>(null)
 
-  const categories = [...new Set(church.galleries.map((g) => g.category).filter(Boolean))]
+  // DB에서 카테고리 + 갤러리 로드
+  useEffect(() => {
+    fetch(`/api/categories?churchId=${church.id}&type=gallery`).then(r => r.json()).then(setCategories)
+    fetch(`/api/galleries?churchId=${church.id}`).then(r => r.json()).then(data => {
+      setGalleries(data.map((g: any) => ({ ...g, createdAt: g.createdAt, description: g.description })))
+    })
+  }, [church.id])
 
   const filtered = activeCategory
-    ? church.galleries.filter((g) => g.category === activeCategory)
-    : church.galleries
+    ? galleries.filter((g) => g.category === activeCategory)
+    : galleries
 
   // ESC로 라이트박스 닫기, 화살표로 이동
   const handleKey = useCallback(
@@ -63,7 +71,7 @@ export default function GalleryClient({ church, colors, slug }: Props) {
             ← {church.name}
           </Link>
           <h1 className="text-3xl font-bold mt-4">📷 갤러리</h1>
-          <p className="text-white/80 mt-2">{church.galleries.length}장의 사진</p>
+          <p className="text-white/80 mt-2">{galleries.length}장의 사진</p>
         </div>
       </header>
 
@@ -82,14 +90,14 @@ export default function GalleryClient({ church, colors, slug }: Props) {
             </button>
             {categories.map((cat) => (
               <button
-                key={cat}
-                onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+                key={cat.id}
+                onClick={() => setActiveCategory(activeCategory === cat.slug ? null : cat.slug)}
                 className={`text-xs px-3 py-1.5 rounded-full font-medium transition ${
-                  activeCategory === cat ? 'text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  activeCategory === cat.slug ? 'text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
-                style={activeCategory === cat ? { backgroundColor: colors.primary } : {}}
+                style={activeCategory === cat.slug ? { backgroundColor: cat.color || colors.primary } : {}}
               >
-                {cat}
+                {cat.icon} {cat.name}
               </button>
             ))}
           </div>
