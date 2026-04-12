@@ -5,10 +5,13 @@ import { NextRequest, NextResponse } from 'next/server'
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
 const MAX_SIZE = 10 * 1024 * 1024 // 10MB
 
+const VALID_CATEGORIES = ['hero', 'gallery', 'sermon', 'profile', 'notice', 'general']
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
     const file = formData.get('file') as File | null
+    const category = (formData.get('category') as string) || 'general'
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -22,10 +25,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'File too large. Max: 10MB' }, { status: 400 })
     }
 
+    const safeCategory = VALID_CATEGORIES.includes(category) ? category : 'general'
     const ext = file.name.split('.').pop() || 'jpg'
-    const sanitized = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').slice(0, 50)
-    const filename = `${Date.now()}-${sanitized}`
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'galleries')
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', safeCategory)
     const filepath = path.join(uploadDir, filename)
 
     await mkdir(uploadDir, { recursive: true })
@@ -33,7 +36,10 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer()
     await writeFile(filepath, Buffer.from(bytes))
 
-    return NextResponse.json({ url: `/uploads/galleries/${filename}` }, { status: 201 })
+    return NextResponse.json({
+      url: `/uploads/${safeCategory}/${filename}`,
+      category: safeCategory,
+    }, { status: 201 })
   } catch (err) {
     console.error('Upload error:', err)
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 })

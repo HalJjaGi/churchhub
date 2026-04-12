@@ -110,7 +110,7 @@ export async function middleware(request: NextRequest) {
   
   // 3. 서브도메인 처리 (프로덕션만)
   const hostname = request.headers.get('host') || ''
-  const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1')
+  const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1') || hostname.includes('trycloudflare.com')
   
   if (!isLocalhost) {
     const subdomain = hostname.split('.')[0]

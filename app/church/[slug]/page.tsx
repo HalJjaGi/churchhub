@@ -106,7 +106,7 @@ export default async function ChurchPage({
         className="min-h-screen flex"
       >
         <div className="flex-1">
-          <HeroComponent theme={theme} churchName={church.name} description={church.description} />
+          <HeroComponent theme={theme} churchName={church.name} description={church.description} heroTitle={church.heroTitle} heroSubtitle={church.heroSubtitle} heroImage={church.heroImage} />
 
           <main className="max-w-3xl mx-auto px-4 py-12 sm:px-6 lg:px-8 space-y-12">
             <WorshipSchedule theme={theme} worshipTimes={church.worshipTimes} />

@@ -37,6 +37,10 @@ model Church {
   pastorImage   String?   // 담임목사 사진 URL
   // 예배 시간 (JSON)
   worshipTimes  String?   // 예배 시간 JSON
+  // 히어로 배너
+  heroTitle     String?   // 히어로 제목
+  heroSubtitle  String?   // 히어로 부제목
+  heroImage     String?   // 히어로 배경 이미지 URL
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   users         User[]

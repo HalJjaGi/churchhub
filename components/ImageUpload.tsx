@@ -6,16 +6,17 @@ type Props = {
   value: string
   onChange: (url: string) => void
   label?: string
+  category?: string // hero, gallery, sermon, profile, notice, general
 }
 
-export function ImageUpload({ value, onChange, label = '이미지' }: Props) {
+export function ImageUpload({ value, onChange, label = '이미지', category = 'general' }: Props) {
   const [uploading, setUploading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const upload = async (file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      alert('5MB 이하 파일만 업로드 가능합니다.')
+    if (file.size > 10 * 1024 * 1024) {
+      alert('10MB 이하 파일만 업로드 가능합니다.')
       return
     }
 
@@ -29,6 +30,7 @@ export function ImageUpload({ value, onChange, label = '이미지' }: Props) {
     try {
       const formData = new FormData()
       formData.append('file', file)
+      formData.append('category', category)
 
       const res = await fetch('/api/upload', {
         method: 'POST',
@@ -126,7 +128,7 @@ export function ImageUpload({ value, onChange, label = '이미지' }: Props) {
             <>
               <span className="text-3xl mb-2">📁</span>
               <p className="text-sm text-gray-500">클릭하거나 파일을 드래그하세요</p>
-              <p className="text-xs text-gray-400 mt-1">jpg, png, gif, webp (최대 5MB)</p>
+              <p className="text-xs text-gray-400 mt-1">jpg, png, gif, webp (최대 10MB)</p>
             </>
           )}
         </div>
@@ -135,7 +137,7 @@ export function ImageUpload({ value, onChange, label = '이미지' }: Props) {
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/gif,image/webp"
+        accept="image/jpeg,image/png,image/png,image/webp"
         onChange={handleFileChange}
         className="hidden"
       />
