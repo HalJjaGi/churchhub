@@ -50,6 +50,7 @@ model Church {
   galleries     Gallery[]
   posts         Post[]
   boards        Board[]
+  categories    Category[]
 }
 
 model User {
@@ -157,4 +158,20 @@ model Board {
   updatedAt   DateTime @updatedAt
 
   @@unique([churchId, slug])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String
+  icon        String?   // 이모지
+  color       String?   // hex color
+  order       Int      @default(0)
+  type        String   @default("gallery") // gallery, post
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([churchId, slug, type])
 }
