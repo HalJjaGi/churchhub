@@ -201,7 +201,7 @@ export default function ChurchAdminPage() {
                 <div className="text-sm text-gray-500">공지 추가, 수정, 삭제</div>
               </div>
             </Link>
-            <div className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg opacity-50 cursor-not-allowed">
+            <Link href={`/admin/${slug}/galleries`} className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
               <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -209,10 +209,37 @@ export default function ChurchAdminPage() {
               </div>
               <div>
                 <div className="font-medium text-gray-900">갤러리</div>
-                <div className="text-sm text-gray-500">준비 중</div>
+                <div className="text-sm text-gray-500">이미지 관리</div>
+              </div>
+            </Link>
+          <a href={`/admin/${slug}/community`} className="block p-6 bg-white rounded-lg shadow hover:shadow-md transition">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">💬</span>
+              <div>
+                <div className="font-medium text-gray-900">커뮤니티</div>
+                <div className="text-sm text-gray-500">게시판 관리</div>
               </div>
             </div>
-          </div>
+          </a>
+          <a href={`/admin/${slug}/hero`} className="block p-6 bg-white rounded-lg shadow hover:shadow-md transition">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🖼</span>
+              <div>
+                <div className="font-medium text-gray-900">히어로 배너</div>
+                <div className="text-sm text-gray-500">메인 배너 설정</div>
+              </div>
+            </div>
+          </a>
+          <a href={`/admin/${slug}/settings`} className="block p-6 bg-white rounded-lg shadow hover:shadow-md transition">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">⚙️</span>
+              <div>
+                <div className="font-medium text-gray-900">교회 관리</div>
+                <div className="text-sm text-gray-500">요금제 변경 / 삭제</div>
+              </div>
+            </div>
+          </a>
+        </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
