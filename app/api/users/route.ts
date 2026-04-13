@@ -64,9 +64,9 @@ export async function POST(request: NextRequest) {
     }
 
     // 비밀번호 강도 검증
-    const strengthError = validatePasswordStrength(password)
-    if (strengthError) {
-      return NextResponse.json({ error: strengthError }, { status: 400 })
+    const validation = validatePasswordStrength(password)
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.errors.join(', ') }, { status: 400 })
     }
 
     // 중복 이메일 체크

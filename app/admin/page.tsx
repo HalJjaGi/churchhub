@@ -80,12 +80,20 @@ export default function SuperAdminDashboard() {
               <h1 className="text-2xl font-bold text-gray-900">ChurchHub</h1>
               <p className="text-sm text-gray-500">Super Admin 대시보드</p>
             </div>
-            <button
-              onClick={() => signOut({ callbackUrl: '/login' })}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border rounded-md hover:bg-gray-50"
-            >
-              로그아웃
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/admin/change-password"
+                className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border rounded-md hover:bg-gray-50"
+              >
+                비밀번호 변경
+              </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: '/login' })}
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border rounded-md hover:bg-gray-50"
+              >
+                로그아웃
+              </button>
+            </div>
           </div>
         </div>
       </header>

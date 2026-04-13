@@ -38,9 +38,9 @@ export async function PUT(
     }
     if (churchId !== undefined) data.churchId = churchId
     if (password) {
-      const strengthError = validatePasswordStrength(password)
-      if (strengthError) {
-        return NextResponse.json({ error: strengthError }, { status: 400 })
+      const validation = validatePasswordStrength(password)
+      if (!validation.valid) {
+        return NextResponse.json({ error: validation.errors.join(', ') }, { status: 400 })
       }
       data.password = await hashPassword(password)
     }
