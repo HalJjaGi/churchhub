@@ -51,6 +51,7 @@ model Church {
   posts         Post[]
   boards        Board[]
   categories    Category[]
+  churchPlugins ChurchPlugin[]
 }
 
 model User {
@@ -60,7 +61,7 @@ model User {
   name      String?
   role      String    @default("member") // super_admin, church_admin, editor, member
   churchId  String?
-  church    Church?   @relation(fields: [churchId], references: [id])
+  church    Church?   @relation(fields: [churchId], references: [id], onDelete: Cascade)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -74,7 +75,7 @@ model Sermon {
   youtubeUrl  String?  // YouTube 영상 URL (선택)
   thumbnail   String?  // 썸네일 이미지 URL (선택)
   churchId    String
-  church      Church   @relation(fields: [churchId], references: [id])
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -86,7 +87,7 @@ model Notice {
   imageUrl    String?   // 첨부 이미지
   pinned      Boolean   @default(false)
   churchId    String
-  church      Church   @relation(fields: [churchId], references: [id])
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -99,7 +100,7 @@ model Schedule {
   endDate     DateTime?
   category    String   @default("general") // general, worship, event, meeting, education
   churchId    String
-  church      Church   @relation(fields: [churchId], references: [id])
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -111,7 +112,7 @@ model Gallery {
   imageUrl    String
   category    String?   // worship, event, community 등
   churchId    String
-  church      Church   @relation(fields: [churchId], references: [id])
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -127,7 +128,7 @@ model Post {
   boardId     String?
   board       Board?    @relation(fields: [boardId], references: [id], onDelete: SetNull)
   churchId    String
-  church      Church    @relation(fields: [churchId], references: [id])
+  church      Church    @relation(fields: [churchId], references: [id], onDelete: Cascade)
   comments    Comment[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -152,7 +153,7 @@ model Board {
   order       Int      @default(0)
   allowWrite  String   @default("all") // all, admin_only, closed
   churchId    String
-  church      Church   @relation(fields: [churchId], references: [id])
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
   posts       Post[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -169,9 +170,44 @@ model Category {
   order       Int      @default(0)
   type        String   @default("gallery") // gallery, post
   churchId    String
-  church      Church   @relation(fields: [churchId], references: [id])
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@unique([churchId, slug, type])
+}
+
+// 플러그인 레지스트리 (시스템 전체)
+model Plugin {
+  id          String   @id @default(cuid())
+  name        String   @unique              // "hero-video"
+  type        String                       // "section" | "feature" | "theme" | "widget"
+  label       String                       // 표시명
+  description String   @default("")
+  version     String   @default("1.0.0")
+  icon        String   @default("📦")
+  config      String   @default("{}")       // 기본 설정 JSON
+  configSchema String  @default("[]")       // 설정 UI 스키마 JSON
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  churchPlugins ChurchPlugin[]
+}
+
+// 교회별 활성화된 플러그인
+model ChurchPlugin {
+  id          String   @id @default(cuid())
+  churchId    String
+  pluginId    String
+  enabled     Boolean  @default(true)
+  config      String   @default("{}")       // 교회별 오버라이드 설정 JSON
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
+  plugin      Plugin   @relation(fields: [pluginId], references: [id], onDelete: Cascade)
+
+  @@unique([churchId, pluginId])
 }
