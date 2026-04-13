@@ -1,0 +1,58 @@
+services:
+  churchhub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: churchhub
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      - DATABASE_URL=postgresql://churchhub:churchhub_password@churchhub-db:5432/churchhub?schema=public
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3002}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_URL=${AUTH_URL:-http://localhost:3002}
+      - NODE_ENV=production
+    depends_on:
+      churchhub-db:
+        condition: service_healthy
+    networks:
+      - churchhub-net
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+
+  churchhub-db:
+    image: postgres:16-alpine
+    container_name: churchhub-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=churchhub
+      - POSTGRES_PASSWORD=churchhub_password
+      - POSTGRES_DB=churchhub
+    volumes:
+      - churchhub-pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U churchhub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - churchhub-net
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+volumes:
+  churchhub-pgdata:
+
+networks:
+  churchhub-net:
+    driver: bridge
