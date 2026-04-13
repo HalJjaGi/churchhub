@@ -50,6 +50,22 @@ export default function ChurchesPage() {
     }
   }
 
+  const handleDelete = async (slug: string, name: string) => {
+    if (!confirm(`"${name}" 교회를 정말 삭제하시겠습니까?\n\n모든 설교, 공지사항, 게시글, 갤러리 등 관련 데이터가 함께 삭제됩니다.`)) return
+
+    try {
+      const res = await fetch(`/api/churches/${slug}`, { method: 'DELETE' })
+      if (res.ok) {
+        setChurches(churches.filter(c => c.slug !== slug))
+      } else {
+        const data = await res.json()
+        alert(data.error || '삭제에 실패했습니다.')
+      }
+    } catch {
+      alert('오류가 발생했습니다.')
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -128,13 +144,19 @@ export default function ChurchesPage() {
                   <td className="px-6 py-4 text-center text-sm text-gray-600">{church._count?.users || 0}</td>
                   <td className="px-6 py-4 text-center text-sm text-gray-600">{church._count?.sermons || 0}</td>
                   <td className="px-6 py-4 text-center text-sm text-gray-600">{church._count?.notices || 0}</td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 text-right space-x-3">
                     <Link
                       href={`/admin/churches/${church.slug}`}
                       className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                     >
                       관리 →
                     </Link>
+                    <button
+                      onClick={() => handleDelete(church.slug, church.name)}
+                      className="text-red-600 hover:text-red-700 text-sm font-medium"
+                    >
+                      삭제
+                    </button>
                   </td>
                 </tr>
               ))}

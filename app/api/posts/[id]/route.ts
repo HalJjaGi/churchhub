@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin } from '@/lib/auth-guard'
 
 // GET /api/posts/[id]
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -15,6 +16,12 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 // PUT /api/posts/[id]
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const existing = await prisma.post.findUnique({ where: { id }, select: { churchId: true } })
+  if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  
+  const authError = await requireAdmin(req, existing.churchId)
+  if (authError) return authError
+
   try {
     const body = await req.json()
     const post = await prisma.post.update({
@@ -22,9 +29,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       data: {
         title: body.title,
         content: body.content,
+        imageUrl: body.imageUrl,
         category: body.category,
         pinned: body.pinned,
-        authorName: body.authorName,
       },
     })
     return NextResponse.json(post)
@@ -34,8 +41,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 // DELETE /api/posts/[id]
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const existing = await prisma.post.findUnique({ where: { id }, select: { churchId: true } })
+  if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  
+  const authError = await requireAdmin(request, existing.churchId)
+  if (authError) return authError
+
   try {
     await prisma.post.delete({ where: { id } })
     return NextResponse.json({ ok: true })
