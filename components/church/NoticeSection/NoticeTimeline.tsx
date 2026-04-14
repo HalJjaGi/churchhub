@@ -10,45 +10,42 @@ export function NoticeTimeline({ theme, notices, churchSlug }: NoticeSectionProp
   if (notices.length === 0) return null
 
   return (
-    <section>
-      <h2
-        className="text-2xl font-bold mb-6"
-        style={{ color: theme.colors.primary }}
-      >
-        공지사항
+    <section id="notices">
+      <h2 className="text-2xl font-bold mb-6" style={{ color: theme.colors.primary }}>
+        📢 공지사항
       </h2>
       <div className="relative">
-        {/* 타임라인 라인 */}
         <div
-          className="absolute left-4 top-0 bottom-0 w-0.5"
-          style={{ backgroundColor: theme.colors.secondary + '40' }}
+          className="absolute left-[9px] top-2 bottom-2 w-0.5 rounded-full"
+          style={{ backgroundColor: `${theme.colors.primary}20` }}
         />
-        <div className="space-y-6">
+        <div className="space-y-4">
           {notices.map((notice) => (
             <a
               key={notice.id}
               href={churchSlug ? `/church/${churchSlug}/notices/${notice.id}` : undefined}
-              className="block relative pl-12"
+              className="flex gap-4 group"
             >
-              {/* 타임라인 점 */}
-              <div
-                className="absolute left-2 top-1 w-5 h-5 rounded-full border-2 bg-white"
-                style={{ borderColor: theme.colors.accent }}
-              />
-              <div className="bg-white rounded-lg shadow-sm p-4">
-                <div className="flex items-center gap-3 mb-2">
+              <div className="relative shrink-0">
+                <div
+                  className="w-5 h-5 rounded-full border-2 bg-white mt-1.5"
+                  style={{ borderColor: notice.pinned ? theme.colors.accent : theme.colors.primary }}
+                />
+              </div>
+              <div className="flex-1 bg-white rounded-xl border border-gray-100 p-4 group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-200">
+                <div className="flex items-center gap-2 mb-1">
                   <span
                     className="text-xs font-medium px-2 py-0.5 rounded-full"
-                    style={{
-                      backgroundColor: theme.colors.accent + '20',
-                      color: theme.colors.accent,
-                    }}
+                    style={{ backgroundColor: `${theme.colors.accent}15`, color: theme.colors.accent }}
                   >
                     {new Date(notice.createdAt).toLocaleDateString('ko-KR')}
                   </span>
+                  {notice.pinned && <span className="text-xs">📌 고정</span>}
                 </div>
-                <h3 className="font-semibold text-gray-900">{notice.title}</h3>
-                <p className="text-sm text-gray-600 mt-1">{notice.content}</p>
+                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                  {notice.title}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1 line-clamp-2">{notice.content}</p>
               </div>
             </a>
           ))}

@@ -32,6 +32,7 @@ export type Notice = {
   title: string
   content: string
   createdAt: Date
+  pinned?: boolean
 }
 
 export type ChurchData = {

@@ -18,7 +18,6 @@ import { FooterMinimal } from '@/components/church/Footer/FooterMinimal'
 import { WorshipSchedule } from '@/components/church/WorshipSchedule/WorshipSchedule'
 import { ScheduleList } from '@/components/church/ScheduleSection/ScheduleList'
 import { GalleryGrid } from '@/components/church/GallerySection/GalleryGrid'
-import Link from 'next/link'
 
 export default async function ChurchPage({
   params,
@@ -60,18 +59,15 @@ export default async function ChurchPage({
     notices: church.notices,
   }
 
-  // 레이아웃에 따라 컴포넌트 선택
   const layout = theme.layout || 'modern'
   const sections = (theme as { sections?: { hero: string; sermon: string; notice: string; footer: string } }).sections
 
-  // 히어로 선택
   const HeroComponent = (sections?.hero === 'image') ? ImageHero
     : (sections?.hero === 'text') ? TextHero
     : (layout === 'traditional') ? ImageHero
     : (layout === 'minimal') ? TextHero
     : GradientHero
 
-  // 설교 섹션 선택
   const SermonComponent = (sections?.sermon === 'list') ? SermonList
     : (sections?.sermon === 'featured') ? SermonFeatured
     : (sections?.sermon === 'cards') ? SermonCards
@@ -79,7 +75,6 @@ export default async function ChurchPage({
     : (layout === 'minimal') ? SermonList
     : SermonCards
 
-  // 공지 섹션 선택
   const NoticeComponent = (sections?.notice === 'table') ? NoticeTable
     : (sections?.notice === 'timeline') ? NoticeTimeline
     : (sections?.notice === 'cards') ? NoticeCards
@@ -87,12 +82,10 @@ export default async function ChurchPage({
     : (layout === 'minimal') ? NoticeTimeline
     : NoticeCards
 
-  // 푸터 선택
   const FooterComponent = (sections?.footer === 'minimal') ? FooterMinimal
     : (layout === 'minimal') ? FooterMinimal
     : FooterFull
 
-  // 미니멀 레이아웃은 사이드바 + 중앙 콘텐츠
   if (layout === 'minimal') {
     return (
       <div
@@ -108,7 +101,7 @@ export default async function ChurchPage({
         <div className="flex-1">
           <HeroComponent theme={theme} churchName={church.name} description={church.description} heroTitle={church.heroTitle} heroSubtitle={church.heroSubtitle} heroImage={church.heroImage} />
 
-          <main className="max-w-3xl mx-auto px-4 py-12 sm:px-6 lg:px-8 space-y-12">
+          <main className="max-w-3xl mx-auto px-4 py-12 sm:px-6 lg:px-8 space-y-16">
             <WorshipSchedule theme={theme} worshipTimes={church.worshipTimes} />
             {modules.sermon && (
               <SermonComponent theme={theme} sermons={churchData.sermons} churchSlug={church.slug} />
@@ -116,7 +109,9 @@ export default async function ChurchPage({
             {modules.notice && (
               <NoticeComponent theme={theme} notices={churchData.notices} churchSlug={church.slug} />
             )}
-            <ScheduleList theme={theme} schedules={church.schedules} churchSlug={church.slug} />
+            <div id="schedule">
+              <ScheduleList theme={theme} schedules={church.schedules} churchSlug={church.slug} />
+            </div>
             {modules.gallery && church.galleries.length > 0 && (
               <GalleryGrid theme={theme} galleries={church.galleries} churchSlug={church.slug} />
             )}
@@ -129,7 +124,6 @@ export default async function ChurchPage({
     )
   }
 
-  // 전통 / 모던 레이아웃
   return (
     <div
       style={{
@@ -142,39 +136,64 @@ export default async function ChurchPage({
       className="min-h-screen"
     >
       <NavTop theme={theme} churchName={church.name} churchSlug={church.slug} />
-      <HeroComponent theme={theme} churchName={church.name} description={church.description} />
+      <HeroComponent theme={theme} churchName={church.name} description={church.description} heroTitle={church.heroTitle} heroSubtitle={church.heroSubtitle} heroImage={church.heroImage} />
 
       <main
         style={{ backgroundColor: 'var(--color-background)' }}
-        className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 space-y-12"
+        className="space-y-0"
       >
-        <WorshipSchedule theme={theme} worshipTimes={church.worshipTimes} />
+        {/* 예배 시간 - 배경색 악센트 */}
+        <section className="py-12" style={{ backgroundColor: `${theme.colors.primary}08` }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <WorshipSchedule theme={theme} worshipTimes={church.worshipTimes} />
+          </div>
+        </section>
 
-        {layout === 'modern' && modules.sermon && church.sermons.length > 0 ? (
-          // 모던: 피처드 설교 + 카드
-          <>
-            <SermonFeatured theme={theme} sermons={churchData.sermons} />
-            {modules.notice && (
-              <NoticeComponent theme={theme} notices={churchData.notices} churchSlug={church.slug} />
-            )}
-          </>
-        ) : (
-          // 전통: 그리드 레이아웃
-          <div className="grid gap-8 lg:grid-cols-2">
-            {modules.sermon && (
-              <SermonComponent theme={theme} sermons={churchData.sermons} churchSlug={church.slug} />
-            )}
-            {modules.notice && (
-              <NoticeComponent theme={theme} notices={churchData.notices} churchSlug={church.slug} />
+        {/* 설교 + 공지 - 메인 배경 */}
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+            {layout === 'modern' && modules.sermon && church.sermons.length > 0 ? (
+              <>
+                <SermonFeatured theme={theme} sermons={churchData.sermons} />
+                {modules.notice && (
+                  <NoticeComponent theme={theme} notices={churchData.notices} churchSlug={church.slug} />
+                )}
+              </>
+            ) : (
+              <div className="grid gap-8 lg:grid-cols-2">
+                {modules.sermon && (
+                  <SermonComponent theme={theme} sermons={churchData.sermons} churchSlug={church.slug} />
+                )}
+                {modules.notice && (
+                  <NoticeComponent theme={theme} notices={churchData.notices} churchSlug={church.slug} />
+                )}
+              </div>
             )}
           </div>
+        </section>
+
+        {/* 일정 - 교대 배경 */}
+        <section id="schedule" className="py-16 bg-gray-50/80">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <ScheduleList theme={theme} schedules={church.schedules} churchSlug={church.slug} />
+          </div>
+        </section>
+
+        {/* 갤러리 - 메인 배경 */}
+        {modules.gallery && church.galleries.length > 0 && (
+          <section className="py-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <GalleryGrid theme={theme} galleries={church.galleries} churchSlug={church.slug} />
+            </div>
+          </section>
         )}
 
-        <ScheduleList theme={theme} schedules={church.schedules} churchSlug={church.slug} />
-        {modules.gallery && church.galleries.length > 0 && (
-          <GalleryGrid theme={theme} galleries={church.galleries} churchSlug={church.slug} />
-        )}
-        <ContactClassic theme={theme} church={churchData} />
+        {/* 연락처 - 교대 배경 */}
+        <section className="py-16 bg-gray-50/80">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <ContactClassic theme={theme} church={churchData} />
+          </div>
+        </section>
       </main>
 
       <FooterComponent theme={theme} churchName={church.name} />

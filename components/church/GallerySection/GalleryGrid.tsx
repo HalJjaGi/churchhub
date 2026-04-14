@@ -27,20 +27,31 @@ export function GalleryGrid({ theme, galleries, churchSlug }: Props) {
         </h2>
         <a
           href={`/church/${churchSlug}/gallery`}
-          className="text-sm font-medium hover:underline"
-          style={{ color: theme.colors.primary }}
+          className="text-sm font-medium hover:underline transition-colors"
+          style={{ color: theme.colors.secondary || theme.colors.primary }}
         >
           전체 보기 →
         </a>
       </div>
       <div className="grid gap-3 grid-cols-2 md:grid-cols-3">
-        {display.map((g) => (
+        {display.map((g, i) => (
           <a
             key={g.id}
             href={`/church/${churchSlug}/gallery`}
-            className="block aspect-square rounded-xl overflow-hidden bg-gray-200 hover:opacity-90 transition"
+            className="group relative block aspect-square rounded-xl overflow-hidden bg-gray-100"
           >
-            <img src={g.imageUrl} alt={g.title} className="w-full h-full object-cover" />
+            <img
+              src={g.imageUrl}
+              alt={g.title}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+              <p className="text-white text-sm font-medium line-clamp-1">{g.title}</p>
+              {g.category && (
+                <p className="text-white/70 text-xs">{g.category}</p>
+              )}
+            </div>
           </a>
         ))}
       </div>

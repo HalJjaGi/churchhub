@@ -13,13 +13,17 @@ export function SermonFeatured({ theme, sermons }: SermonSectionProps) {
 
   return (
     <section>
-      {/* 피처드 설교 */}
+      <h2 className="text-2xl font-bold mb-6" style={{ color: theme.colors.primary }}>
+        📖 최근 설교
+      </h2>
+
+      {/* 피처드 */}
       <div
-        className="rounded-xl overflow-hidden shadow-lg mb-8"
+        className="rounded-xl overflow-hidden shadow-lg mb-6"
         style={{ backgroundColor: theme.colors.primary }}
       >
         <div className="grid md:grid-cols-2">
-          {featured.thumbnail && (
+          {featured.thumbnail ? (
             <div className="aspect-video md:aspect-auto">
               <img
                 src={featured.thumbnail}
@@ -27,48 +31,48 @@ export function SermonFeatured({ theme, sermons }: SermonSectionProps) {
                 className="w-full h-full object-cover"
               />
             </div>
+          ) : (
+            <div className="hidden md:flex items-center justify-center bg-white/10">
+              <span className="text-6xl">📖</span>
+            </div>
           )}
-          <div className="p-8 text-white flex flex-col justify-center">
-            <span className="text-sm font-medium opacity-80 mb-2">이번 주 설교</span>
-            <h2 className="text-3xl font-bold mb-3">{featured.title}</h2>
-            <p className="opacity-90 mb-2">{featured.speaker}</p>
-            <p className="text-sm opacity-70">
-              {new Date(featured.date).toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </p>
+          <div className="p-6 md:p-8 text-white flex flex-col justify-center">
+            <span className="text-xs font-medium opacity-70 uppercase tracking-wider mb-2">
+              이번 주 설교
+            </span>
+            <h3 className="text-2xl font-bold mb-3">{featured.title}</h3>
+            <p className="text-sm opacity-80 mb-4 line-clamp-3">{featured.content}</p>
+            <div className="flex items-center gap-3 text-sm opacity-70">
+              <span>{featured.speaker}</span>
+              <span>·</span>
+              <span>{new Date(featured.date).toLocaleDateString('ko-KR')}</span>
+            </div>
             {featured.youtubeUrl && (
               <a
                 href={featured.youtubeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition text-sm font-medium"
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors w-fit"
               >
-                ▶ 설교 영상 보기
+                ▶ 영상 보기
               </a>
             )}
           </div>
         </div>
       </div>
 
-      {/* 나머지 설교 */}
+      {/* 나머지 카드 */}
       {rest.length > 0 && (
-        <div className="space-y-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {rest.map((sermon) => (
-            <div key={sermon.id} className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm">
-              <div
-                className="w-2 h-12 rounded-full flex-shrink-0"
-                style={{ backgroundColor: theme.colors.accent }}
-              />
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-gray-900 truncate">{sermon.title}</h3>
-                <p className="text-sm text-gray-500">{sermon.speaker}</p>
-              </div>
-              <time className="text-sm text-gray-400 flex-shrink-0">
-                {new Date(sermon.date).toLocaleDateString('ko-KR')}
-              </time>
+            <div
+              key={sermon.id}
+              className="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <h4 className="font-semibold text-gray-900 line-clamp-1">{sermon.title}</h4>
+              <p className="text-sm text-gray-500 mt-1">
+                {sermon.speaker} · {new Date(sermon.date).toLocaleDateString('ko-KR')}
+              </p>
             </div>
           ))}
         </div>
