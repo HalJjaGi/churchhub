@@ -10,17 +10,41 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url)
   const slug = searchParams.get('slug')
+  const page = parseInt(searchParams.get('page') || '1', 10)
+  const limit = parseInt(searchParams.get('limit') || '20', 10)
+  const month = searchParams.get('month') || '' // format: YYYY-MM
+  const category = searchParams.get('category') || ''
 
   if (!slug) {
     return NextResponse.json({ error: 'slug 파라미터가 필요합니다.' }, { status: 400 })
   }
 
   try {
-    const schedules = await prisma.schedule.findMany({
-      where: { church: { slug } },
-      orderBy: { date: 'asc' },
+    const where: any = { church: { slug } }
+    if (month) {
+      const [y, m] = month.split('-').map(Number)
+      const start = new Date(y, m - 1, 1)
+      const end = new Date(y, m, 1)
+      where.date = { gte: start, lt: end }
+    }
+    if (category) {
+      where.category = category
+    }
+
+    const [schedules, total] = await Promise.all([
+      prisma.schedule.findMany({
+        where,
+        orderBy: { date: 'asc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.schedule.count({ where }),
+    ])
+
+    return NextResponse.json({
+      schedules,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     })
-    return NextResponse.json(schedules)
   } catch (error) {
     console.error('Error fetching schedules:', error)
     return NextResponse.json({ error: '일정을 불러오는데 실패했습니다.' }, { status: 500 })

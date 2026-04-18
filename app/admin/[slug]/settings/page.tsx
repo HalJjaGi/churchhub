@@ -11,6 +11,20 @@ const planLabels: Record<string, { name: string; desc: string; color: string }> 
   enterprise: { name: '엔터프라이즈', desc: '전체 기능 + 우선 지원', color: 'bg-orange-100 text-orange-700' },
 }
 
+type ChurchForm = {
+  intro: string
+  vision: string
+  address: string
+  phone: string
+  email: string
+  parking: string
+  pastorName: string
+  pastorMessage: string
+  pastorImage: string
+  heroTitle: string
+  heroSubtitle: string
+}
+
 export default function ChurchManagePage() {
   const params = useParams()
   const router = useRouter()
@@ -22,13 +36,50 @@ export default function ChurchManagePage() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
 
+  const [form, setForm] = useState<ChurchForm>({
+    intro: '', vision: '', address: '', phone: '', email: '', parking: '',
+    pastorName: '', pastorMessage: '', pastorImage: '',
+    heroTitle: '', heroSubtitle: '',
+  })
+
   useEffect(() => {
     fetch(`/api/churches/${slug}`).then(r => r.json()).then(data => {
       setChurch(data)
       setPlan(data.plan || 'starter')
+      setForm({
+        intro: data.intro || '',
+        vision: data.vision || '',
+        address: data.address || '',
+        phone: data.phone || '',
+        email: data.email || '',
+        parking: data.parking || '',
+        pastorName: data.pastorName || '',
+        pastorMessage: data.pastorMessage || '',
+        pastorImage: data.pastorImage || '',
+        heroTitle: data.heroTitle || '',
+        heroSubtitle: data.heroSubtitle || '',
+      })
       setLoading(false)
     })
   }, [slug])
+
+  const handleSaveInfo = async () => {
+    setSaving(true)
+    setMessage('')
+    const res = await fetch(`/api/churches/${slug}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      setChurch({ ...church, ...form, ...data })
+      setMessage('교회 정보가 저장되었습니다.')
+    } else {
+      setMessage('저장에 실패했습니다.')
+    }
+    setSaving(false)
+  }
 
   const handlePlanChange = async () => {
     setSaving(true)
@@ -63,6 +114,9 @@ export default function ChurchManagePage() {
     }
   }
 
+  const inputClass = 'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+  const labelClass = 'block text-sm font-medium text-gray-700 mb-1'
+
   if (loading) return <div className="min-h-screen flex items-center justify-center">로딩 중...</div>
 
   return (
@@ -83,15 +137,91 @@ export default function ChurchManagePage() {
           </div>
         )}
 
-        {/* 교회 정보 */}
+        {/* 교회 기본 정보 */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">📋 교회 정보</h2>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div><span className="text-gray-500">이름:</span> <span className="font-medium">{church?.name}</span></div>
-            <div><span className="text-gray-500">슬러그:</span> <span className="font-medium">{slug}</span></div>
-            <div><span className="text-gray-500">설명:</span> <span className="font-medium">{church?.description || '없음'}</span></div>
-            <div><span className="text-gray-500">생성일:</span> <span className="font-medium">{church?.createdAt ? new Date(church.createdAt).toLocaleDateString('ko-KR') : '-'}</span></div>
+          <h2 className="text-lg font-bold text-gray-900 mb-4">📋 교회 기본 정보</h2>
+          <div className="space-y-4">
+            <div>
+              <label className={labelClass}>교회 이름</label>
+              <div className="text-sm font-medium text-gray-900 py-2">{church?.name}</div>
+            </div>
+            <div>
+              <label className={labelClass}>교회 소개</label>
+              <textarea rows={3} value={form.intro} onChange={e => setForm({ ...form, intro: e.target.value })} className={inputClass} placeholder="교회 소개를 입력하세요" />
+            </div>
+            <div>
+              <label className={labelClass}>비전</label>
+              <textarea rows={2} value={form.vision} onChange={e => setForm({ ...form, vision: e.target.value })} className={inputClass} placeholder="교회 비전을 입력하세요" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>주소</label>
+                <input type="text" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className={inputClass} placeholder="교회 주소" />
+              </div>
+              <div>
+                <label className={labelClass}>전화번호</label>
+                <input type="text" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className={inputClass} placeholder="02-0000-0000" />
+              </div>
+              <div>
+                <label className={labelClass}>이메일</label>
+                <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className={inputClass} placeholder="church@example.com" />
+              </div>
+              <div>
+                <label className={labelClass}>주차 안내</label>
+                <input type="text" value={form.parking} onChange={e => setForm({ ...form, parking: e.target.value })} className={inputClass} placeholder="주차 안내 문구" />
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* 담임목사 */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">🙏 담임목사</h2>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>담임목사명</label>
+                <input type="text" value={form.pastorName} onChange={e => setForm({ ...form, pastorName: e.target.value })} className={inputClass} placeholder="목사명" />
+              </div>
+              <div>
+                <label className={labelClass}>사진 URL</label>
+                <input type="url" value={form.pastorImage} onChange={e => setForm({ ...form, pastorImage: e.target.value })} className={inputClass} placeholder="https://..." />
+              </div>
+            </div>
+            <div>
+              <label className={labelClass}>인사말</label>
+              <textarea rows={4} value={form.pastorMessage} onChange={e => setForm({ ...form, pastorMessage: e.target.value })} className={inputClass} placeholder="담임목사 인사말을 입력하세요" />
+            </div>
+            {form.pastorImage && (
+              <div>
+                <label className={labelClass}>사진 미리보기</label>
+                <img src={form.pastorImage} alt="담임목사" className="w-32 h-32 rounded-full object-cover border" />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 히어로 배너 */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">🎨 히어로 배너</h2>
+          <div className="space-y-4">
+            <div>
+              <label className={labelClass}>히어로 제목</label>
+              <input type="text" value={form.heroTitle} onChange={e => setForm({ ...form, heroTitle: e.target.value })} className={inputClass} placeholder="메인 페이지에 표시될 제목" />
+            </div>
+            <div>
+              <label className={labelClass}>히어로 부제목</label>
+              <input type="text" value={form.heroSubtitle} onChange={e => setForm({ ...form, heroSubtitle: e.target.value })} className={inputClass} placeholder="제목 아래에 표시될 부제목" />
+            </div>
+          </div>
+        </div>
+
+        {/* 저장 버튼 */}
+        <div className="flex justify-end">
+          <button onClick={handleSaveInfo} disabled={saving}
+            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 font-medium">
+            {saving ? '저장 중...' : '💾 모든 정보 저장'}
+          </button>
         </div>
 
         {/* 요금제 변경 */}
