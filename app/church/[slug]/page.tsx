@@ -19,6 +19,7 @@ import { WorshipSchedule } from '@/components/church/WorshipSchedule/WorshipSche
 import { ScheduleList } from '@/components/church/ScheduleSection/ScheduleList'
 import { GalleryGrid } from '@/components/church/GallerySection/GalleryGrid'
 import { AboutSection } from '@/components/church/AboutSection/AboutSection'
+import SubscribeForm from './SubscribeForm'
 
 export default async function ChurchPage({
   params,
@@ -199,6 +200,13 @@ export default async function ChurchPage({
             </div>
           </section>
         )}
+
+        {/* 소식 구독 */}
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SubscribeForm churchId={church.id} churchSlug={church.slug} />
+          </div>
+        </section>
 
         {/* 연락처 - 교대 배경 */}
         <section className="py-16 bg-gray-50/80">
