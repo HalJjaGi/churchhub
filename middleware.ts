@@ -95,7 +95,9 @@ export async function middleware(request: NextRequest) {
   // 2. API 라우트 접근 제어 (GET 제외)
   if (pathname.startsWith('/api') && 
       request.method !== 'GET' &&
-      !pathname.startsWith('/api/auth')) {
+      !pathname.startsWith('/api/auth') &&
+      !pathname.startsWith('/api/subscribe') &&
+      !pathname.startsWith('/api/prayer')) {
     const token = await getToken({ req: request, secret: SECRET })
     
     if (!token) {
