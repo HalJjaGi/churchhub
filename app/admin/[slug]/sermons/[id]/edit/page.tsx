@@ -16,6 +16,9 @@ export default function EditSermonPage() {
     speaker: '',
     date: '',
     youtubeUrl: '',
+    series: '',
+    bibleRef: '',
+    tags: '',
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -36,6 +39,9 @@ export default function EditSermonPage() {
           speaker: data.speaker,
           date: data.date ? new Date(data.date).toISOString().split('T')[0] : '',
           youtubeUrl: data.youtubeUrl || '',
+          series: data.series || '',
+          bibleRef: data.bibleRef || '',
+          tags: data.tags || '',
         })
       } else {
         setError('설교를 찾을 수 없습니다.')
@@ -61,6 +67,9 @@ export default function EditSermonPage() {
           ...form,
           date: form.date || undefined,
           youtubeUrl: form.youtubeUrl || null,
+          series: form.series || null,
+          bibleRef: form.bibleRef || null,
+          tags: form.tags || null,
         }),
       })
 
@@ -144,6 +153,47 @@ export default function EditSermonPage() {
               onChange={(e) => setForm({ ...form, content: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                설교 시리즈
+              </label>
+              <input
+                type="text"
+                value={form.series}
+                onChange={(e) => setForm({ ...form, series: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 로마서 강해"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                성경 구절
+              </label>
+              <input
+                type="text"
+                value={form.bibleRef}
+                onChange={(e) => setForm({ ...form, bibleRef: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 요한복음 3:16"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                태그
+              </label>
+              <input
+                type="text"
+                value={form.tags}
+                onChange={(e) => setForm({ ...form, tags: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="쉼표로 구분: 믿음,은혜,구원"
+              />
+            </div>
           </div>
 
           <div>

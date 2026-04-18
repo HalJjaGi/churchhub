@@ -53,7 +53,7 @@ export async function PUT(
 
   try {
     const body = await request.json()
-    const { title, content, speaker, date, youtubeUrl } = body
+    const { title, content, speaker, date, youtubeUrl, series, bibleRef, tags } = body
 
     let thumbnail = undefined
     if (youtubeUrl !== undefined) {
@@ -68,6 +68,9 @@ export async function PUT(
         content: content !== undefined ? sanitizeText(content) : undefined,
         speaker: speaker !== undefined ? sanitizeText(speaker) : undefined,
         date: date ? new Date(date) : undefined,
+        series: series !== undefined ? (series ? sanitizeText(series) : null) : undefined,
+        bibleRef: bibleRef !== undefined ? (bibleRef ? sanitizeText(bibleRef) : null) : undefined,
+        tags: tags !== undefined ? (tags ? sanitizeText(tags) : null) : undefined,
         youtubeUrl: youtubeUrl !== undefined ? (youtubeUrl ? sanitizeURL(youtubeUrl) : null) : undefined,
         thumbnail,
       },

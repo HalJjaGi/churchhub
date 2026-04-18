@@ -68,11 +68,11 @@ export default async function NoticeDetailPage({
         {/* 다른 공지 */}
         <div className="mt-8">
           <Link
-            href={`/church/${slug}`}
+            href={`/church/${slug}/notices`}
             className="inline-flex items-center gap-1 hover:underline"
             style={{ color: colors.primary }}
           >
-            ← 교회 메인으로
+            ← 공지 목록으로
           </Link>
         </div>
       </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -18,14 +18,14 @@ export default function NewNoticePage() {
   const [error, setError] = useState('')
 
   // 교회 정보 가져오기 (churchId 획득용)
-  useState(() => {
+  useEffect(() => {
     fetch(`/api/churches/${slug}`)
       .then((res) => res.json())
       .then((data) => {
-        setChurchId(data.id)
+        if (data.id) setChurchId(data.id)
       })
       .catch(console.error)
-  })
+  }, [slug])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -74,6 +74,9 @@ model Sermon {
   date        DateTime @default(now())
   youtubeUrl  String?  // YouTube 영상 URL (선택)
   thumbnail   String?  // 썸네일 이미지 URL (선택)
+  series      String?  // 설교 시리즈 (예: "로마서 강해", "2026 새해 특별")
+  bibleRef    String?  // 성경 구절 (예: "요한복음 3:16", "창세기 1-2장")
+  tags        String?  // 태그 (쉼표 구분, 예: "믿음,은혜,구원")
   churchId    String
   church      Church   @relation(fields: [churchId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())

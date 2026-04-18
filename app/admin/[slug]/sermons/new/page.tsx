@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ImageUpload } from '@/components/ImageUpload'
@@ -17,20 +17,23 @@ export default function NewSermonPage() {
     date: '',
     youtubeUrl: '',
     thumbnail: '',
+    series: '',
+    bibleRef: '',
+    tags: '',
   })
   const [churchId, setChurchId] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   // 교회 정보 가져오기 (churchId 획득용)
-  useState(() => {
+  useEffect(() => {
     fetch(`/api/churches/${slug}`)
       .then((res) => res.json())
       .then((data) => {
-        setChurchId(data.id)
+        if (data.id) setChurchId(data.id)
       })
       .catch(console.error)
-  })
+  }, [slug])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -156,6 +159,47 @@ export default function NewSermonPage() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="https://www.youtube.com/watch?v=..."
             />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                설교 시리즈
+              </label>
+              <input
+                type="text"
+                value={form.series}
+                onChange={(e) => setForm({ ...form, series: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 로마서 강해"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                성경 구절
+              </label>
+              <input
+                type="text"
+                value={form.bibleRef}
+                onChange={(e) => setForm({ ...form, bibleRef: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="예: 요한복음 3:16"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                태그
+              </label>
+              <input
+                type="text"
+                value={form.tags}
+                onChange={(e) => setForm({ ...form, tags: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="쉼표로 구분: 믿음,은혜,구원"
+              />
+            </div>
           </div>
 
           <ImageUpload

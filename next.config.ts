@@ -43,6 +43,11 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['*.trycloudflare.com', '*.pages.dev', '*'],
+    },
+  },
 };
 
 export default nextConfig;

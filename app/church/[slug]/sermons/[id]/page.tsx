@@ -97,7 +97,36 @@ export default async function SermonDetailPage({
             <span>{sermon.speaker}</span>
           </div>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">{sermon.title}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{sermon.title}</h1>
+
+          {/* 시리즈 & 성경 구절 */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {sermon.series && (
+              <span className="inline-block text-sm px-3 py-1 rounded-full text-white" style={{ backgroundColor: colors.primary }}>
+                {sermon.series}
+              </span>
+            )}
+            {sermon.bibleRef && (
+              <span className="inline-block text-sm px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                📕 {sermon.bibleRef}
+              </span>
+            )}
+          </div>
+
+          {/* 태그 */}
+          {sermon.tags && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {sermon.tags.split(',').map((tag, i) => (
+                <a
+                  key={i}
+                  href={`/church/${slug}/sermons?search=${tag.trim()}`}
+                  className="text-sm bg-gray-100 text-gray-600 px-3 py-1 rounded-full hover:bg-gray-200 transition"
+                >
+                  #{tag.trim()}
+                </a>
+              ))}
+            </div>
+          )}
 
           {sermon.content && (
             <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap">

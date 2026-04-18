@@ -18,6 +18,7 @@ import { FooterMinimal } from '@/components/church/Footer/FooterMinimal'
 import { WorshipSchedule } from '@/components/church/WorshipSchedule/WorshipSchedule'
 import { ScheduleList } from '@/components/church/ScheduleSection/ScheduleList'
 import { GalleryGrid } from '@/components/church/GallerySection/GalleryGrid'
+import { AboutSection } from '@/components/church/AboutSection/AboutSection'
 
 export default async function ChurchPage({
   params,
@@ -148,6 +149,17 @@ export default async function ChurchPage({
             <WorshipSchedule theme={theme} worshipTimes={church.worshipTimes} />
           </div>
         </section>
+
+        {/* 교회 소개 */}
+        <AboutSection
+          theme={theme}
+          churchSlug={church.slug}
+          intro={church.intro}
+          vision={church.vision}
+          pastorName={church.pastorName}
+          pastorMessage={church.pastorMessage}
+          pastorImage={church.pastorImage}
+        />
 
         {/* 설교 + 공지 - 메인 배경 */}
         <section className="py-16">

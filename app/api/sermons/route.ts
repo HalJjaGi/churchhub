@@ -19,13 +19,49 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'slug 파라미터가 필요합니다.' }, { status: 400 })
     }
 
-    const sermons = await prisma.sermon.findMany({
-      where: { church: { slug } },
-      include: { church: { select: { name: true, slug: true } } },
-      orderBy: { date: 'desc' },
+    const page = parseInt(searchParams.get('page') || '1', 10)
+    const limit = parseInt(searchParams.get('limit') || '10', 10)
+    const search = searchParams.get('search') || ''
+    const series = searchParams.get('series') || ''
+    const tag = searchParams.get('tag') || ''
+
+    const where: any = { church: { slug } }
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { speaker: { contains: search, mode: 'insensitive' } },
+        { content: { contains: search, mode: 'insensitive' } },
+        { bibleRef: { contains: search, mode: 'insensitive' } },
+      ]
+    }
+    if (series) {
+      where.series = series
+    }
+    if (tag) {
+      where.tags = { contains: tag, mode: 'insensitive' }
+    }
+
+    const [sermons, total] = await Promise.all([
+      prisma.sermon.findMany({
+        where,
+        include: { church: { select: { name: true, slug: true } } },
+        orderBy: { date: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.sermon.count({ where }),
+    ])
+
+    return NextResponse.json({
+      sermons,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
     })
-    
-    return NextResponse.json(sermons)
   } catch (error) {
     console.error('Error fetching sermons:', error)
     return NextResponse.json({ error: '설교 목록을 불러오는데 실패했습니다.' }, { status: 500 })
@@ -39,7 +75,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { title, content, speaker, date, youtubeUrl, churchId } = body
+    const { title, content, speaker, date, youtubeUrl, series, bibleRef, tags, churchId } = body
 
     // churchId로 권한 검증
     const authError = await requireAdmin(request, churchId)
@@ -66,6 +102,9 @@ export async function POST(request: NextRequest) {
         date: date ? new Date(date) : new Date(),
         youtubeUrl: youtubeUrl ? sanitizeURL(youtubeUrl) : null,
         thumbnail,
+        series: series ? sanitizeText(series) : null,
+        bibleRef: bibleRef ? sanitizeText(bibleRef) : null,
+        tags: tags ? sanitizeText(tags) : null,
         churchId,
       },
     })
