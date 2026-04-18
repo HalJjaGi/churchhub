@@ -85,12 +85,12 @@ export default function PrayerPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 sm:mb-8">
         <h1 className="text-2xl font-bold">🙏 기도 요청</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition min-h-[44px]"
         >
           {showForm ? '닫기' : '+ 기도 요청하기'}
         </button>
@@ -105,9 +105,9 @@ export default function PrayerPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && (setPage(1), fetchPrayers())}
-            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
           />
-          <button onClick={() => { setPage(1); fetchPrayers() }} className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
+          <button onClick={() => { setPage(1); fetchPrayers() }} className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">
             검색
           </button>
         </div>
@@ -115,21 +115,21 @@ export default function PrayerPage() {
 
       {/* 작성 폼 */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-8 p-6 bg-white rounded-xl shadow-md border">
+        <form onSubmit={handleSubmit} className="mb-8 p-4 sm:p-6 bg-white rounded-xl shadow-md border">
           <h2 className="text-lg font-semibold mb-4">새 기도 요청</h2>
           <input
             type="text" placeholder="제목" value={formTitle} onChange={(e) => setFormTitle(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required
+            className="w-full px-4 py-2 border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" required
           />
           <textarea
             placeholder="기도 요청 내용" value={formContent} onChange={(e) => setFormContent(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg mb-3 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" required
           />
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4">
             {!formAnonymous && (
               <input
                 type="text" placeholder="이름 (선택)" value={formAuthor} onChange={(e) => setFormAuthor(e.target.value)}
-                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full sm:w-auto px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
               />
             )}
             <label className="flex items-center gap-2 cursor-pointer">
@@ -139,7 +139,7 @@ export default function PrayerPage() {
           </div>
           <button
             type="submit" disabled={submitting}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 min-h-[44px]"
           >
             {submitting ? '작성 중...' : '기도 요청 올리기'}
           </button>
@@ -150,7 +150,10 @@ export default function PrayerPage() {
       {loading ? (
         <div className="text-center py-12 text-gray-500">불러오는 중...</div>
       ) : prayers.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">기도 요청이 없습니다.</div>
+        <div className="text-center py-12 text-gray-400">
+          <span className="text-4xl mb-3 block">🙏</span>
+          <p>기도 요청이 없습니다</p>
+        </div>
       ) : (
         <div className="grid gap-4">
           {prayers.map((prayer) => (
@@ -164,13 +167,13 @@ export default function PrayerPage() {
                 )}
               </div>
               <p className="text-gray-600 mb-3 whitespace-pre-wrap">{prayer.content}</p>
-              <div className="flex items-center justify-between text-sm text-gray-400">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-gray-400">
                 <span>
                   {prayer.isAnonymous ? '익명' : prayer.authorName || '익명'} · {formatDate(prayer.createdAt)}
                 </span>
                 <button
                   onClick={() => handlePray(prayer.id)}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-full hover:bg-amber-100 transition"
+                  className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-full hover:bg-amber-100 transition min-h-[36px]"
                 >
                   🙏 {prayer.prayerCount}
                 </button>
@@ -185,12 +188,12 @@ export default function PrayerPage() {
         <div className="flex justify-center gap-2 mt-8">
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-            className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-50"
+            className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-50 min-h-[44px] min-w-[60px]"
           >이전</button>
-          <span className="px-3 py-1">{page} / {totalPages}</span>
+          <span className="px-3 py-1 flex items-center">{page} / {totalPages}</span>
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-            className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-50"
+            className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-50 min-h-[44px] min-w-[60px]"
           >다음</button>
         </div>
       )}

@@ -7,15 +7,19 @@ type NoticeSectionProps = {
 }
 
 export function NoticeTable({ theme, notices, churchSlug }: NoticeSectionProps) {
-  if (notices.length === 0) return null
-
   return (
     <section id="notices" className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100">
+      <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
         <h2 className="text-2xl font-bold" style={{ color: theme.colors.primary }}>
           📢 공지사항
         </h2>
       </div>
+      {notices.length === 0 ? (
+        <div className="p-8 sm:p-12 text-center">
+          <span className="text-4xl mb-3 block">📢</span>
+          <p className="text-gray-400 text-sm">아직 등록된 공지사항이 없습니다</p>
+        </div>
+      ) : (
       <div className="divide-y divide-gray-100">
         {notices.map((notice) => (
           <a
@@ -39,6 +43,7 @@ export function NoticeTable({ theme, notices, churchSlug }: NoticeSectionProps) 
           </a>
         ))}
       </div>
+      )}
     </section>
   )
 }

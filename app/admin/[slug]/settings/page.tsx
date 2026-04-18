@@ -195,7 +195,7 @@ export default function ChurchManagePage() {
             {form.pastorImage && (
               <div>
                 <label className={labelClass}>사진 미리보기</label>
-                <img src={form.pastorImage} alt="담임목사" className="w-32 h-32 rounded-full object-cover border" />
+                <img src={form.pastorImage} alt="담임목사 프로필" loading="lazy" className="w-32 h-32 rounded-full object-cover border" />
               </div>
             )}
           </div>

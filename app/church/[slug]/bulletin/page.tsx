@@ -33,14 +33,17 @@ export default function BulletinListPage() {
   }, [slug, page])
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-8">📰 주보</h1>
+    <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
+      <h1 className="text-2xl font-bold mb-6 sm:mb-8">📰 주보</h1>
       {loading ? (
         <div className="text-center py-12 text-gray-500">불러오는 중...</div>
       ) : bulletins.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">주보가 없습니다.</div>
+        <div className="text-center py-12 text-gray-400">
+          <span className="text-4xl mb-3 block">📰</span>
+          <p>주보가 없습니다</p>
+        </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {bulletins.map((b) => (
             <Link key={b.id} href={`/church/${slug}/bulletin/${b.id}`}
               className="p-5 bg-white rounded-xl shadow-sm border hover:shadow-md transition block"
@@ -55,9 +58,9 @@ export default function BulletinListPage() {
       )}
       {totalPages > 1 && (
         <div className="flex justify-center gap-2 mt-8">
-          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 border rounded disabled:opacity-50">이전</button>
-          <span className="px-3 py-1">{page} / {totalPages}</span>
-          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 border rounded disabled:opacity-50">다음</button>
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 border rounded disabled:opacity-50 min-h-[44px]">이전</button>
+          <span className="px-3 py-1 flex items-center">{page} / {totalPages}</span>
+          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 border rounded disabled:opacity-50 min-h-[44px]">다음</button>
         </div>
       )}
     </div>

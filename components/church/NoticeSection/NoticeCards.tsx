@@ -7,11 +7,9 @@ type NoticeSectionProps = {
 }
 
 export function NoticeCards({ theme, notices, churchSlug }: NoticeSectionProps) {
-  if (notices.length === 0) return null
-
   const isNew = (date: Date | string) => {
     const diff = Date.now() - new Date(date).getTime()
-    return diff < 7 * 24 * 60 * 60 * 1000 // 7일 이내
+    return diff < 7 * 24 * 60 * 60 * 1000
   }
 
   return (
@@ -19,6 +17,12 @@ export function NoticeCards({ theme, notices, churchSlug }: NoticeSectionProps) 
       <h2 className="text-2xl font-bold mb-6" style={{ color: theme.colors.primary }}>
         📢 공지사항
       </h2>
+      {notices.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-100 p-8 sm:p-12 text-center">
+          <span className="text-4xl mb-3 block">📢</span>
+          <p className="text-gray-400 text-sm">아직 등록된 공지사항이 없습니다</p>
+        </div>
+      ) : (
       <div className="grid gap-4 sm:grid-cols-2">
         {notices.map((notice) => (
           <a
@@ -48,6 +52,7 @@ export function NoticeCards({ theme, notices, churchSlug }: NoticeSectionProps) 
           </a>
         ))}
       </div>
+      )}
     </section>
   )
 }

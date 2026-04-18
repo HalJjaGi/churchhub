@@ -75,17 +75,19 @@ export default async function SermonsPage({ params, searchParams }: Props) {
       <div className="container mx-auto px-4 max-w-5xl py-8">
         {/* 검색 & 필터 */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <form method="GET" action={`/church/${slug}/sermons`} className="flex gap-2 flex-1">
+          <form method="GET" action={`/church/${slug}/sermons`} className="flex gap-2 flex-1" role="search">
+            <label htmlFor="sermon-search" className="sr-only">설교 검색</label>
             <input
+              id="sermon-search"
               type="text"
               name="search"
               defaultValue={search}
               placeholder="제목, 설교자, 성경 구절 검색..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
             />
             <button
               type="submit"
-              className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition"
+              className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition min-h-[44px]"
               style={{ backgroundColor: colors.primary }}
             >
               검색
@@ -129,10 +131,11 @@ export default async function SermonsPage({ params, searchParams }: Props) {
         {/* 설교 목록 */}
         {sermons.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-lg shadow">
-            <p className="text-gray-400 text-lg">등록된 설교가 없습니다.</p>
+            <span className="text-4xl mb-3 block">📖</span>
+            <p className="text-gray-400">등록된 설교가 없습니다.</p>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {sermons.map((sermon) => (
               <a
                 key={sermon.id}
@@ -142,7 +145,7 @@ export default async function SermonsPage({ params, searchParams }: Props) {
                 {/* 썸네일 */}
                 <div className="w-full h-44 bg-gray-100 overflow-hidden relative">
                   {sermon.thumbnail ? (
-                    <img src={sermon.thumbnail} alt={sermon.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <img src={sermon.thumbnail} alt={sermon.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-4xl" style={{ backgroundColor: `${colors.primary}15` }}>
                       📖

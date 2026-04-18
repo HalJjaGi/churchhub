@@ -8,22 +8,28 @@ type SermonSectionProps = {
 }
 
 export function SermonList({ theme, sermons, churchSlug }: SermonSectionProps) {
-  if (sermons.length === 0) return null
-
   return (
     <section>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold" style={{ color: theme.colors.primary }}>
           📖 최근 설교
         </h2>
-        <Link
+        {sermons.length > 0 && (
+          <Link
           href={`/church/${churchSlug}/sermons`}
           className="text-sm font-medium hover:underline transition-colors"
           style={{ color: theme.colors.secondary || theme.colors.primary }}
         >
           전체 보기 →
         </Link>
+        )}
       </div>
+      {sermons.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-100 p-8 sm:p-12 text-center">
+          <span className="text-4xl mb-3 block">📖</span>
+          <p className="text-gray-400 text-sm">아직 등록된 설교가 없습니다</p>
+        </div>
+      ) : (
       <div className="bg-white rounded-xl border border-gray-100 divide-y divide-gray-100 overflow-hidden">
         {sermons.map((sermon) => (
           <Link
@@ -56,6 +62,7 @@ export function SermonList({ theme, sermons, churchSlug }: SermonSectionProps) {
           </Link>
         ))}
       </div>
+      )}
     </section>
   )
 }

@@ -83,7 +83,7 @@ export default async function SermonDetailPage({
         )}
 
         {/* 메타 정보 */}
-        <article className="bg-white rounded-xl shadow-sm p-8">
+        <article className="bg-white rounded-xl shadow-sm p-4 sm:p-8">
           <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
             <time>
               {new Date(sermon.date).toLocaleDateString('ko-KR', {

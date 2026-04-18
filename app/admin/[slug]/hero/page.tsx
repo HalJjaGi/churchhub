@@ -108,7 +108,7 @@ export default function HeroSettingsPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">미리보기</label>
               <div className="relative h-48 rounded-xl overflow-hidden bg-gray-900">
-                <img src={form.heroImage} alt="preview" className="w-full h-full object-cover opacity-60" />
+                <img src={form.heroImage} alt="히어로 이미지 미리보기" className="w-full h-full object-cover opacity-60" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-4">
                   {form.heroTitle && <h2 className="text-2xl font-bold">{form.heroTitle}</h2>}
                   {form.heroSubtitle && <p className="text-sm mt-2 text-white/80">{form.heroSubtitle}</p>}

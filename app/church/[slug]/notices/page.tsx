@@ -69,17 +69,19 @@ export default async function NoticesPage({ params, searchParams }: Props) {
 
       <div className="container mx-auto px-4 max-w-4xl py-8">
         {/* 검색 */}
-        <form method="GET" action={`/church/${slug}/notices`} className="flex gap-2 mb-6">
+        <form method="GET" action={`/church/${slug}/notices`} className="flex gap-2 mb-6" role="search">
+          <label htmlFor="notice-search" className="sr-only">공지사항 검색</label>
           <input
+            id="notice-search"
             type="text"
             name="search"
             defaultValue={search}
             placeholder="공지사항 검색..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
           />
           <button
             type="submit"
-            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition"
+            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition min-h-[44px]"
             style={{ backgroundColor: colors.primary }}
           >
             검색
@@ -93,7 +95,8 @@ export default async function NoticesPage({ params, searchParams }: Props) {
         {/* 공지 목록 */}
         {notices.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-lg shadow">
-            <p className="text-gray-400 text-lg">공지사항이 없습니다.</p>
+            <span className="text-4xl mb-3 block">📢</span>
+            <p className="text-gray-400">공지사항이 없습니다.</p>
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm divide-y">
@@ -101,7 +104,7 @@ export default async function NoticesPage({ params, searchParams }: Props) {
               <a
                 key={notice.id}
                 href={`/church/${slug}/notices/${notice.id}`}
-                className="block px-6 py-5 hover:bg-gray-50 transition"
+                className="block px-4 sm:px-6 py-5 hover:bg-gray-50 transition"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -121,7 +124,7 @@ export default async function NoticesPage({ params, searchParams }: Props) {
                 </div>
                 {notice.imageUrl && (
                   <div className="mt-3">
-                    <img src={notice.imageUrl} alt="" className="w-20 h-14 object-cover rounded" />
+                    <img src={notice.imageUrl} alt={notice.title} className="w-20 h-14 object-cover rounded" />
                   </div>
                 )}
               </a>

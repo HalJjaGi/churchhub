@@ -157,14 +157,14 @@ export default function CommunityClient({ slug, church, colors, posts, activeCat
                   </div>
                   <h3 className="font-semibold text-gray-900 mt-1">{post.title}</h3>
                   <p className="text-sm text-gray-600 mt-1 line-clamp-2">{post.content}</p>
-                  {post.imageUrl && <img src={post.imageUrl} alt="" className="mt-2 h-32 object-cover rounded-md" />}
+                  {post.imageUrl && <img src={post.imageUrl} alt={post.title} loading="lazy" className="mt-2 h-32 object-cover rounded-md" />}
                   <span className="text-xs text-gray-400 mt-2 inline-block">💬 {post.comments.length}</span>
                 </div>
 
                 {expandedPost === post.id && (
                   <div className="border-t px-4 py-4">
                     <p className="text-sm text-gray-700 whitespace-pre-wrap">{post.content}</p>
-                    {post.imageUrl && <img src={post.imageUrl} alt="" className="mt-3 max-h-64 object-cover rounded-lg" />}
+                    {post.imageUrl && <img src={post.imageUrl} alt={`${post.title} 이미지`} loading="lazy" className="mt-3 max-h-64 object-cover rounded-lg" />}
 
                     {post.comments.length > 0 && (
                       <div className="mt-4 space-y-2">

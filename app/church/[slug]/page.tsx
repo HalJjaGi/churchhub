@@ -137,10 +137,12 @@ export default async function ChurchPage({
       } as React.CSSProperties}
       className="min-h-screen"
     >
+      <a href="#main-content" className="skip-to-content">본문으로 건너뛰기</a>
       <NavTop theme={theme} churchName={church.name} churchSlug={church.slug} />
       <HeroComponent theme={theme} churchName={church.name} description={church.description} heroTitle={church.heroTitle} heroSubtitle={church.heroSubtitle} heroImage={church.heroImage} />
 
       <main
+        id="main-content"
         style={{ backgroundColor: 'var(--color-background)' }}
         className="space-y-0"
       >
@@ -204,7 +206,7 @@ export default async function ChurchPage({
         {/* 소식 구독 */}
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SubscribeForm churchId={church.id} churchSlug={church.slug} />
+            <SubscribeForm slug={church.slug} />
           </div>
         </section>
 

@@ -31,9 +31,9 @@ export default function BulletinDetailPage() {
   try { content = JSON.parse(bulletin.content) } catch {}
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">{bulletin.title}</h1>
+    <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">{bulletin.title}</h1>
         <button
           onClick={() => window.print()}
           className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm print:hidden"
@@ -42,7 +42,7 @@ export default function BulletinDetailPage() {
         </button>
       </div>
 
-      <div className="p-8 bg-white rounded-xl shadow-md border print:shadow-none print:border-0">
+      <div className="p-4 sm:p-8 bg-white rounded-xl shadow-md border print:shadow-none print:border-0">
         <div className="text-center mb-8 pb-4 border-b">
           <p className="text-gray-500">
             {new Date(bulletin.date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}

@@ -180,7 +180,7 @@ export default function SermonListPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         {sermon.thumbnail && (
-                          <img src={sermon.thumbnail} alt="" className="w-16 h-10 object-cover rounded mr-3" />
+                          <img src={sermon.thumbnail} alt={sermon.title} className="w-16 h-10 object-cover rounded mr-3" />
                         )}
                         <div>
                           <div className="font-medium text-gray-900">{sermon.title}</div>

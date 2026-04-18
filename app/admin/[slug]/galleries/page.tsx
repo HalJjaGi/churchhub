@@ -129,7 +129,7 @@ export default function AdminGalleriesPage() {
               {galleries.map((g) => (
                 <div key={g.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
                   <div className="aspect-square bg-gray-200">
-                    <img src={g.imageUrl} alt={g.title} className="w-full h-full object-cover" />
+                    <img src={g.imageUrl} alt={g.title} loading="lazy" className="w-full h-full object-cover" />
                   </div>
                   <div className="p-4">
                     <h3 className="font-semibold text-gray-900 truncate">{g.title}</h3>

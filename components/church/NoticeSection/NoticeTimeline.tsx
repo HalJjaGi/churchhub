@@ -7,13 +7,17 @@ type NoticeSectionProps = {
 }
 
 export function NoticeTimeline({ theme, notices, churchSlug }: NoticeSectionProps) {
-  if (notices.length === 0) return null
-
   return (
     <section id="notices">
       <h2 className="text-2xl font-bold mb-6" style={{ color: theme.colors.primary }}>
         📢 공지사항
       </h2>
+      {notices.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-100 p-8 sm:p-12 text-center">
+          <span className="text-4xl mb-3 block">📢</span>
+          <p className="text-gray-400 text-sm">아직 등록된 공지사항이 없습니다</p>
+        </div>
+      ) : (
       <div className="relative">
         <div
           className="absolute left-[9px] top-2 bottom-2 w-0.5 rounded-full"
@@ -51,6 +55,7 @@ export function NoticeTimeline({ theme, notices, churchSlug }: NoticeSectionProp
           ))}
         </div>
       </div>
+      )}
     </section>
   )
 }

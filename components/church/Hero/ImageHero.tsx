@@ -18,7 +18,7 @@ export function ImageHero({ theme, churchName, description, heroTitle, heroSubti
       {heroImage ? (
         <>
           <div className="absolute inset-0">
-            <img src={heroImage} alt="" className="w-full h-full object-cover" />
+            <img src={heroImage} alt={`${churchName} 배경 이미지`} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
           </div>
         </>

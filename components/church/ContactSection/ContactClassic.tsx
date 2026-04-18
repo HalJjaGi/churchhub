@@ -10,7 +10,7 @@ export function ContactClassic({ theme, church }: ContactProps) {
   if (!hasContact) return null
 
   return (
-    <section className="bg-white rounded-lg shadow-md p-6">
+    <section className="bg-white rounded-lg shadow-md p-4 sm:p-6">
       <h2
         className="text-2xl font-bold mb-6"
         style={{ color: theme.colors.primary }}

@@ -32,6 +32,8 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     bulletins: items,
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+  }, {
+    headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
   })
 }
 
