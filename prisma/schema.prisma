@@ -268,3 +268,28 @@ model ChurchPlugin {
 
   @@unique([churchId, pluginId])
 }
+
+// 교회 신청 모델
+model ChurchApplication {
+  id           String   @id @default(cuid())
+  churchName   String
+  pastorName   String
+  phone        String
+  email        String
+  address      String
+  website      String?
+  description  String
+  theme        String   @default("modern")
+  slug         String?  @unique
+  status       String   @default("pending") // pending, approved, rejected
+  submittedAt  DateTime @default(now())
+  reviewedAt   DateTime?
+  reviewedBy   String?
+  notes        String?
+  userId       String?  // 신청한 사용자
+  churchId     String?  // 승인된 교회 ID
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("church_applications")
+}
