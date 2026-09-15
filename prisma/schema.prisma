@@ -288,6 +288,12 @@ model ChurchApplication {
   notes        String?
   userId       String?  // 신청한 사용자
   churchId     String?  // 승인된 교회 ID
+  // 추가 신청 정보
+  memberCount     Int?
+  establishedYear Int?
+  agreeTerms      Boolean  @default(false)
+  agreePrivacy    Boolean  @default(false)
+  agreeMarketing  Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

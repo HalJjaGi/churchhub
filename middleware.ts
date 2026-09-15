@@ -97,7 +97,9 @@ export async function middleware(request: NextRequest) {
       request.method !== 'GET' &&
       !pathname.startsWith('/api/auth') &&
       !pathname.startsWith('/api/subscribe') &&
-      !pathname.startsWith('/api/prayer')) {
+      !pathname.startsWith('/api/prayer') &&
+      !pathname.startsWith('/api/churches/application') &&
+      !pathname.startsWith('/api/applications/search')) {
     const token = await getToken({ req: request, secret: SECRET })
     
     if (!token) {
