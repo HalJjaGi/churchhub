@@ -61,9 +61,12 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url))
       }
 
-      // URL에서 slug 추출
-      const slugMatch = pathname.match(/^\/admin\/([^/]+)/)
-      if (slugMatch) {
+      // 교회 slug가 아닌 특수 페이지는 slug 소유 검증 제외
+      const nonChurchPaths = ['/admin/change-password']
+      if (!nonChurchPaths.includes(pathname)) {
+        // URL에서 slug 추출
+        const slugMatch = pathname.match(/^\/admin\/([^/]+)/)
+        if (slugMatch) {
         const slug = slugMatch[1]
         
         const church = await prisma.church.findUnique({ 
@@ -82,6 +85,7 @@ export async function middleware(request: NextRequest) {
           }
           
           return NextResponse.redirect(new URL('/login', request.url))
+        }
         }
       }
       
@@ -133,6 +137,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Prisma 사용을 위해 Node.js 런타임에서 실행 (엣지에선 PrismaClient 불가)
+  runtime: 'nodejs',
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)',
   ],

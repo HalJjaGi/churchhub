@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getToken } from 'next-auth/jwt'
+import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 import { prisma } from '@/lib/prisma'
+import { emailService } from '@/lib/email'
 
 const SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
 
@@ -30,6 +33,24 @@ const DEFAULT_MODULES = {
   community: false,
   gallery: false,
   donation: false,
+}
+
+// 임시 비밀번호 생성: 영문 대소문자+숫자+특수문자 포함 12자리
+function generateTempPassword(): string {
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ'
+  const lower = 'abcdefghijkmnpqrstuvwxyz'
+  const digits = '23456789'
+  const special = '!@#$%^&*'
+  const all = upper + lower + digits + special
+  const pick = (chars: string) => chars[crypto.randomInt(chars.length)]
+  const chars = [pick(upper), pick(lower), pick(digits), pick(special)]
+  for (let i = 0; i < 8; i++) chars.push(pick(all))
+  // Fisher-Yates 셔플
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = crypto.randomInt(i + 1)
+    ;[chars[i], chars[j]] = [chars[j], chars[i]]
+  }
+  return chars.join('')
 }
 
 async function requireSuperAdmin(request: NextRequest) {
@@ -113,6 +134,15 @@ export async function PATCH(request: NextRequest) {
           notes: notes || null,
         },
       })
+      // 반려 안내 이메일 (SMTP 미설정 시 로그만 남음)
+      emailService.sendEmail({
+        to: updated.email,
+        subject: `[ChurchHub] '${updated.churchName}' 신청 반려 안내`,
+        html: `<p>안녕하세요, ${updated.pastorName} 목사님.</p>
+               <p>아쉽게도 '${updated.churchName}' 교회 웹사이트 신청이 반려되었습니다.</p>
+               ${notes ? `<p>반려 사유: ${notes}</p>` : ''}
+               <p>문의사항은 support@churchhub.co.kr 로 연락해 주세요.</p>`,
+      }).catch(() => {})
       return NextResponse.json({ message: '신청을 반려했습니다.', application: updated })
     }
 
@@ -153,6 +183,29 @@ export async function PATCH(request: NextRequest) {
         select: { id: true, slug: true, name: true },
       })
 
+      // ── 교회 관리자 계정 자동 생성 ──
+      // 신청자 이메일로 church_admin 계정 생성. 이미 가입된 이메일이면 건너뛴다.
+      let adminAccount: { email: string; tempPassword: string } | null = null
+      let accountSkipped = false
+      const existingUser = await tx.user.findUnique({
+        where: { email: application.email },
+      })
+      if (existingUser) {
+        accountSkipped = true
+      } else {
+        const tempPassword = generateTempPassword()
+        await tx.user.create({
+          data: {
+            email: application.email,
+            name: application.pastorName,
+            password: await bcrypt.hash(tempPassword, 10),
+            role: 'church_admin',
+            churchId: church.id,
+          },
+        })
+        adminAccount = { email: application.email, tempPassword }
+      }
+
       const updatedApplication = await tx.churchApplication.update({
         where: { id },
         data: {
@@ -163,13 +216,35 @@ export async function PATCH(request: NextRequest) {
         },
       })
 
-      return { church, application: updatedApplication }
+      return { church, application: updatedApplication, adminAccount, accountSkipped }
     })
+
+    // 승인 안내 이메일 (SMTP 미설정 시 로그만 남음)
+    emailService.sendEmail({
+      to: result.application.email,
+      subject: `[ChurchHub] '${result.church.name}' 교회 웹사이트 신청 승인`,
+      html: `
+        <p>안녕하세요, ${result.application.pastorName} 목사님!</p>
+        <p>축하합니다! <strong>${result.church.name}</strong> 교회 웹사이트 신청이 승인되었습니다.</p>
+        <p>교회 사이트: https://churchhub.co.kr/church/${result.church.slug}</p>
+        ${result.adminAccount ? `
+          <p>교회 관리자 계정이 생성되었습니다.</p>
+          <ul>
+            <li>로그인 주소: https://churchhub.co.kr/login</li>
+            <li>이메일: ${result.adminAccount.email}</li>
+            <li>임시 비밀번호: <strong>${result.adminAccount.tempPassword}</strong></li>
+          </ul>
+          <p>로그인 후 반드시 비밀번호를 변경해 주세요.</p>
+        ` : ''}
+      `,
+    }).catch(() => {})
 
     return NextResponse.json({
       message: `승인 완료! ${result.church.name} 사이트가 생성되었습니다.`,
       church: result.church,
       application: result.application,
+      adminAccount: result.adminAccount,
+      accountSkipped: result.accountSkipped,
     })
   } catch (error) {
     if (error instanceof Error) {

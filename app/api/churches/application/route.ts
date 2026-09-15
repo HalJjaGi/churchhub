@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
+import { emailService } from '@/lib/email'
 
 // POST /api/churches/application — 교회 웹사이트 신청 접수
 const applicationSchema = z.object({
@@ -138,6 +139,18 @@ export async function POST(request: NextRequest) {
       },
       select: { id: true },
     })
+
+    // 접수 확인 이메일 (SMTP 미설정 시 로그만 남음)
+    emailService.sendEmail({
+      to: v.contactEmail.toLowerCase(),
+      subject: `[ChurchHub] '${v.churchName}' 교회 웹사이트 신청 접수`,
+      html: `
+        <p>안녕하세요, ${v.pastorName} 목사님.</p>
+        <p><strong>${v.churchName}</strong> 교회 웹사이트 신청이 정상적으로 접수되었습니다.</p>
+        <p>접수 내용은 3영업일 내 검토하여 결과를 안내드립니다.</p>
+        <p>신청 상태 조회: https://churchhub.co.kr/apply/status</p>
+      `,
+    }).catch(() => {})
 
     return NextResponse.json(
       {

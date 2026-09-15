@@ -57,6 +57,7 @@ export default function AdminApplicationsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [actionMessage, setActionMessage] = useState('')
+  const [accountInfo, setAccountInfo] = useState<{ email: string; tempPassword: string; churchName: string; siteUrl: string } | null>(null)
   const [processingId, setProcessingId] = useState<string | null>(null)
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [rejectNote, setRejectNote] = useState('')
@@ -91,6 +92,7 @@ export default function AdminApplicationsPage() {
   const handleApprove = async (id: string) => {
     setProcessingId(id)
     setActionMessage('')
+    setAccountInfo(null)
     try {
       const res = await fetch('/api/admin/applications', {
         method: 'PATCH',
@@ -99,7 +101,19 @@ export default function AdminApplicationsPage() {
       })
       const data = await res.json()
       setActionMessage(res.ok ? data.message : `❌ ${data.message || '승인 실패'}`)
-      if (res.ok) await load(filter)
+      if (res.ok) {
+        if (data.adminAccount?.tempPassword) {
+          setAccountInfo({
+            email: data.adminAccount.email,
+            tempPassword: data.adminAccount.tempPassword,
+            churchName: data.church.name,
+            siteUrl: `/church/${data.church.slug}`,
+          })
+        } else if (data.accountSkipped) {
+          setActionMessage((m) => m + ' (이미 가입된 이메일이라 관리자 계정 생성은 건너뛰었어요)')
+        }
+        await load(filter)
+      }
     } catch {
       setActionMessage('❌ 네트워크 오류가 발생했습니다.')
     } finally {
@@ -162,6 +176,23 @@ export default function AdminApplicationsPage() {
         {actionMessage && (
           <div className={`mb-6 p-4 rounded-lg border ${actionMessage.startsWith('❌') ? 'bg-red-50 border-red-200 text-red-800' : 'bg-green-50 border-green-200 text-green-800'}`}>
             {actionMessage}
+          </div>
+        )}
+
+        {accountInfo && (
+          <div className="mb-6 bg-white border-2 border-amber-300 rounded-lg shadow p-6">
+            <h2 className="text-lg font-bold text-amber-900 mb-2">🔐 교회 관리자 계정이 생성되었습니다</h2>
+            <p className="text-sm text-amber-800 mb-4">
+              아래 정보를 <strong>{accountInfo.churchName}</strong> 담당자에게 전달해 주세요.
+              SMTP 미설정으로 자동 이메일이 발송되지 않으니 수동으로 알려주셔야 합니다.
+              이 화면을 벗어나면 임시 비밀번호를 다시 볼 수 없습니다.
+            </p>
+            <div className="bg-amber-50 rounded-lg p-4 font-mono text-sm space-y-1">
+              <div>로그인: <span className="font-bold">https://churchhub.co.kr/login</span></div>
+              <div>이메일: <span className="font-bold">{accountInfo.email}</span></div>
+              <div>임시 비밀번호: <span className="font-bold text-base">{accountInfo.tempPassword}</span></div>
+            </div>
+            <p className="text-xs text-amber-700 mt-3">⚠️ 첫 로그인 후 비밀번호 변경을 안내해 주세요.</p>
           </div>
         )}
 
