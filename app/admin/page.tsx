@@ -22,7 +22,7 @@ type RecentUser = {
 }
 
 export default function SuperAdminDashboard() {
-  const [stats, setStats] = useState({ churches: 0, users: 0, sermons: 0, notices: 0 })
+  const [stats, setStats] = useState({ churches: 0, users: 0, sermons: 0, notices: 0, pendingApplications: 0 })
   const [churches, setChurches] = useState<ChurchStats[]>([])
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([])
   const [loading, setLoading] = useState(true)
@@ -33,9 +33,10 @@ export default function SuperAdminDashboard() {
 
   const loadData = async () => {
     try {
-      const [churchRes, userRes] = await Promise.all([
+      const [churchRes, userRes, appRes] = await Promise.all([
         fetch('/api/churches'),
         fetch('/api/users'),
+        fetch('/api/admin/applications?status=all'),
       ])
 
       if (churchRes.ok) {
@@ -48,12 +49,17 @@ export default function SuperAdminDashboard() {
           totalSermons += c._count?.sermons || 0
           totalNotices += c._count?.notices || 0
         })
-        setStats({ churches: churchData.length, users: totalUsers, sermons: totalSermons, notices: totalNotices })
+        setStats((prev) => ({ ...prev, churches: churchData.length, users: totalUsers, sermons: totalSermons, notices: totalNotices }))
       }
 
       if (userRes.ok) {
         const userData = await userRes.json()
         setRecentUsers(userData.slice(0, 5))
+      }
+
+      if (appRes.ok) {
+        const appData = await appRes.json()
+        setStats((prev) => ({ ...prev, pendingApplications: appData.counts?.pending || 0 }))
       }
     } catch (error) {
       console.error('Error loading data:', error)
@@ -104,8 +110,8 @@ export default function SuperAdminDashboard() {
           {[
             { label: '교회', value: stats.churches, color: 'bg-blue-500', href: '/admin/churches' },
             { label: '계정', value: stats.users, color: 'bg-green-500', href: '/admin/churches' },
+            { label: '신청 대기', value: stats.pendingApplications, color: 'bg-teal-500', href: '/admin/applications' },
             { label: '설교', value: stats.sermons, color: 'bg-purple-500', href: '#' },
-            { label: '공지', value: stats.notices, color: 'bg-orange-500', href: '#' },
           ].map((stat) => (
             <Link key={stat.label} href={stat.href}
               className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
@@ -137,6 +143,25 @@ export default function SuperAdminDashboard() {
                 <div>
                   <div className="font-medium text-gray-900">교회 관리</div>
                   <div className="text-sm text-gray-500">교회 목록 조회, 추가, 계정 관리</div>
+                </div>
+              </Link>
+              <Link
+                href="/admin/applications"
+                className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+              >
+                <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center">
+                  <span className="text-teal-600 text-sm">📨</span>
+                </div>
+                <div>
+                  <div className="font-medium text-gray-900">
+                    교회 신청 처리
+                    {stats.pendingApplications > 0 && (
+                      <span className="ml-2 px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-xs font-bold">
+                        {stats.pendingApplications}건 대기
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-sm text-gray-500">신청 승인/반려 — 승인 시 사이트 자동 생성</div>
                 </div>
               </Link>
             </div>
