@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 
 type Church = {
   id: string
@@ -33,6 +34,7 @@ export default function ChurchAdminPage() {
   const params = useParams()
   const router = useRouter()
   const slug = params.slug as string
+  const { data: session } = useSession()
   
   const [church, setChurch] = useState<Church | null>(null)
   const [loading, setLoading] = useState(true)
@@ -212,6 +214,17 @@ export default function ChurchAdminPage() {
                 <div className="text-sm text-gray-500">이미지 관리</div>
               </div>
             </Link>
+            {session?.user?.role === 'church_admin' && (
+              <Link href={`/admin/${slug}/users`} className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                  <span className="text-purple-600">👥</span>
+                </div>
+                <div>
+                  <div className="font-medium text-gray-900">하위 관리자</div>
+                  <div className="text-sm text-gray-500">콘텐츠 함께 관리할 분 초대</div>
+                </div>
+              </Link>
+            )}
           <a href={`/admin/${slug}/community`} className="block p-6 bg-white rounded-lg shadow hover:shadow-md transition">
             <div className="flex items-center gap-3">
               <span className="text-2xl">💬</span>
