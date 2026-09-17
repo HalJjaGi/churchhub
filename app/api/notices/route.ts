@@ -1,3 +1,4 @@
+import { requireContentAdmin } from '@/lib/auth-guard'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
@@ -53,6 +54,9 @@ export async function POST(req: NextRequest) {
   try {
     const { title, content, imageUrl, pinned, churchId } = await req.json()
     if (!title || !content || !churchId) return NextResponse.json({ error: 'title, content, churchId required' }, { status: 400 })
+
+    const authError = await requireContentAdmin(req, churchId)
+    if (authError) return authError
 
     const notice = await prisma.notice.create({
       data: { title: sanitizeText(title), content: sanitizeText(content), imageUrl, pinned: pinned || false, churchId },

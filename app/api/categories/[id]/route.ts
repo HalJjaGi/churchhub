@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { requireAdmin } from '@/lib/auth-guard'
+import { requireContentAdmin } from '@/lib/auth-guard'
 
 // GET /api/categories/[id]
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -16,7 +16,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const existing = await prisma.category.findUnique({ where: { id }, select: { churchId: true } })
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   
-  const authError = await requireAdmin(req, existing.churchId)
+  const authError = await requireContentAdmin(req, existing.churchId)
   if (authError) return authError
 
   try {
@@ -43,7 +43,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   const existing = await prisma.category.findUnique({ where: { id }, select: { churchId: true } })
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   
-  const authError = await requireAdmin(request, existing.churchId)
+  const authError = await requireContentAdmin(request, existing.churchId)
   if (authError) return authError
 
   try {

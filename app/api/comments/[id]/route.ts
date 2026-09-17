@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { requireAdmin } from '@/lib/auth-guard'
+import { requireContentAdmin } from '@/lib/auth-guard'
 
 // GET /api/comments/[id]
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -34,7 +34,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   })
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   
-  const authError = await requireAdmin(request, existing.post.churchId)
+  const authError = await requireContentAdmin(request, existing.post.churchId)
   if (authError) return authError
 
   try {

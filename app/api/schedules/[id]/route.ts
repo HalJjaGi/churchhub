@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
 import { sanitizeText } from '@/lib/sanitize'
-import { requireAdmin } from '@/lib/auth-guard'
+import { requireContentAdmin } from '@/lib/auth-guard'
 
 export async function GET(
   request: NextRequest,
@@ -44,7 +44,7 @@ export async function PUT(
     return NextResponse.json({ error: '일정을 찾을 수 없습니다.' }, { status: 404 })
   }
 
-  const authError = await requireAdmin(request, existing.churchId)
+  const authError = await requireContentAdmin(request, existing.churchId)
   if (authError) return authError
 
   try {
@@ -83,7 +83,7 @@ export async function DELETE(
     return NextResponse.json({ error: '일정을 찾을 수 없습니다.' }, { status: 404 })
   }
 
-  const authError = await requireAdmin(request, existing.churchId)
+  const authError = await requireContentAdmin(request, existing.churchId)
   if (authError) return authError
 
   try {

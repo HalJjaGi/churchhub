@@ -49,6 +49,38 @@ export async function requireAdmin(request: NextRequest, targetChurchId?: string
 }
 
 // slug로 churchId 조회 후 권한 확인
+// 콘텐츠 관리 권한: super_admin + church_admin + editor(하위 관리자) — 자기 교회만
+// 설정/테마/플러그인 등에는 requireAdmin(super_admin+church_admin)을 그대로 사용
+export async function requireContentAdmin(request: NextRequest, targetChurchId?: string) {
+  const token = await getTokenCompat(request)
+
+  if (!token) {
+    return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
+  }
+
+  const role = token.role as string
+
+  if (role === 'super_admin') {
+    return null
+  }
+
+  if (role === 'church_admin' || role === 'editor') {
+    const userChurchId = token.churchId as string | undefined
+
+    if (!userChurchId) {
+      return NextResponse.json({ error: '교회가 등록되지 않았습니다.' }, { status: 403 })
+    }
+
+    if (targetChurchId && targetChurchId !== userChurchId) {
+      return NextResponse.json({ error: '해당 교회에 대한 권한이 없습니다.' }, { status: 403 })
+    }
+
+    return null
+  }
+
+  return NextResponse.json({ error: '관리 권한이 필요합니다.' }, { status: 403 })
+}
+
 export async function requireAdminForSlug(request: NextRequest, slug: string) {
   const church = await prisma.church.findUnique({
     where: { slug },

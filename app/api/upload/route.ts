@@ -1,6 +1,7 @@
 import { writeFile, mkdir, unlink } from 'fs/promises'
 import path from 'path'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireContentAdmin } from '@/lib/auth-guard'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
 const MAX_SIZE = 10 * 1024 * 1024 // 10MB
@@ -9,6 +10,10 @@ const VALID_CATEGORIES = ['hero', 'gallery', 'sermon', 'profile', 'notice', 'gen
 
 export async function POST(req: NextRequest) {
   try {
+    // 업로드는 로그인한 콘텐츠 관리자만
+    const authError = await requireContentAdmin(req)
+    if (authError) return authError
+
     const formData = await req.formData()
     const file = formData.get('file') as File | null
     const category = (formData.get('category') as string) || 'general'
@@ -48,6 +53,9 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const authError = await requireContentAdmin(req)
+    if (authError) return authError
+
     const { url } = await req.json()
     if (!url || !url.startsWith('/uploads/')) {
       return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })

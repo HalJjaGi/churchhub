@@ -120,25 +120,38 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const application = await prisma.churchApplication.create({
-      data: {
-        churchName: v.churchName,
-        pastorName: v.pastorName,
-        phone: v.contactPhone,
-        email: v.contactEmail.toLowerCase(),
-        address: v.address,
-        website: v.website || null,
-        description: v.description || '',
-        theme: v.theme,
-        slug,
-        memberCount: parsePositiveInt(v.memberCount),
-        establishedYear: parsePositiveInt(v.establishedYear),
-        agreeTerms: v.agreeTerms,
-        agreePrivacy: v.agreePrivacy,
-        agreeMarketing: v.agreeMarketing,
-      },
-      select: { id: true },
-    })
+    let applicationId: string
+    try {
+      const application = await prisma.churchApplication.create({
+        data: {
+          churchName: v.churchName,
+          pastorName: v.pastorName,
+          phone: v.contactPhone,
+          email: v.contactEmail.toLowerCase(),
+          address: v.address,
+          website: v.website || null,
+          description: v.description || '',
+          theme: v.theme,
+          slug,
+          memberCount: parsePositiveInt(v.memberCount),
+          establishedYear: parsePositiveInt(v.establishedYear),
+          agreeTerms: v.agreeTerms,
+          agreePrivacy: v.agreePrivacy,
+          agreeMarketing: v.agreeMarketing,
+        },
+        select: { id: true },
+      })
+      applicationId = application.id
+    } catch (e) {
+      // 동시 제출 경쟁으로 DB 유니크 제약에 걸린 경우 (email 활성 신청 or slug)
+      if (e && typeof e === 'object' && 'code' in e && (e as { code?: string }).code === 'P2002') {
+        return NextResponse.json(
+          { message: '이미 접수된 신청이 있습니다. 검토 결과를 기다려주시거나 신청 상태 조회를 이용해주세요.' },
+          { status: 409 }
+        )
+      }
+      throw e
+    }
 
     // 접수 확인 이메일 (SMTP 미설정 시 로그만 남음)
     emailService.sendEmail({
@@ -155,7 +168,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         message: '교회 신청이 정상적으로 접수되었습니다.',
-        applicationId: application.id,
+        applicationId: applicationId,
       },
       { status: 201 }
     )

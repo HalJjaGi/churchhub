@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
 import { sanitizeText, sanitizeURL } from '@/lib/sanitize'
 import { extractYouTubeId, getYouTubeThumbnail } from '@/lib/youtube'
-import { requireAdmin } from '@/lib/auth-guard'
+import { requireContentAdmin } from '@/lib/auth-guard'
 
 // 설교 상세 조회 (공개)
 export async function GET(
@@ -48,7 +48,7 @@ export async function PUT(
     return NextResponse.json({ error: '설교를 찾을 수 없습니다.' }, { status: 404 })
   }
 
-  const authError = await requireAdmin(request, existing.churchId)
+  const authError = await requireContentAdmin(request, existing.churchId)
   if (authError) return authError
 
   try {
@@ -99,7 +99,7 @@ export async function DELETE(
     return NextResponse.json({ error: '설교를 찾을 수 없습니다.' }, { status: 404 })
   }
 
-  const authError = await requireAdmin(request, existing.churchId)
+  const authError = await requireContentAdmin(request, existing.churchId)
   if (authError) return authError
 
   try {

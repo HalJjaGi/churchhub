@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
 import { sanitizeText } from '@/lib/sanitize'
-import { requireAdmin } from '@/lib/auth-guard'
+import { requireContentAdmin } from '@/lib/auth-guard'
 
 export async function GET(request: NextRequest) {
   const rateLimitResponse = await apiRateLimit(request)
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '필수 항목이 누락되었습니다.' }, { status: 400 })
     }
 
-    const authError = await requireAdmin(request, churchId)
+    const authError = await requireContentAdmin(request, churchId)
     if (authError) return authError
 
     const schedule = await prisma.schedule.create({

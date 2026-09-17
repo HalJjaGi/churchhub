@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
 import { sanitizeText } from '@/lib/sanitize'
-import { requireAdmin } from '@/lib/auth-guard'
+import { requireContentAdmin } from '@/lib/auth-guard'
 
 // 주보 목록 조회
 export async function GET(request: NextRequest) {
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'churchId 또는 slug가 필요합니다.' }, { status: 400 })
     }
 
-    const authError = await requireAdmin(request, resolvedChurchId)
+    const authError = await requireContentAdmin(request, resolvedChurchId)
     if (authError) return authError
 
     const bulletin = await prisma.bulletin.create({

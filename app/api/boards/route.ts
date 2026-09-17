@@ -1,3 +1,4 @@
+import { requireContentAdmin } from '@/lib/auth-guard'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
@@ -19,6 +20,9 @@ export async function POST(req: NextRequest) {
   try {
     const { name, slug, description, icon, order, allowWrite, churchId } = await req.json()
     if (!name || !slug || !churchId) return NextResponse.json({ error: 'name, slug, churchId required' }, { status: 400 })
+
+    const authError = await requireContentAdmin(req, churchId)
+    if (authError) return authError
 
     const board = await prisma.board.create({
       data: { name, slug, description, icon, order: order || 0, allowWrite: allowWrite || 'all', churchId },

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
-import { requireAdmin } from '@/lib/auth-guard'
+import { requireContentAdmin } from '@/lib/auth-guard'
 
 // 주보 상세 조회
 export async function GET(
@@ -33,7 +33,7 @@ export async function PUT(
     return NextResponse.json({ error: '주보를 찾을 수 없습니다.' }, { status: 404 })
   }
 
-  const authError = await requireAdmin(request, bulletin.churchId)
+  const authError = await requireContentAdmin(request, bulletin.churchId)
   if (authError) return authError
 
   try {
@@ -67,7 +67,7 @@ export async function DELETE(
     return NextResponse.json({ error: '주보를 찾을 수 없습니다.' }, { status: 404 })
   }
 
-  const authError = await requireAdmin(request, bulletin.churchId)
+  const authError = await requireContentAdmin(request, bulletin.churchId)
   if (authError) return authError
 
   await prisma.bulletin.delete({ where: { id } })

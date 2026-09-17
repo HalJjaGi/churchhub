@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
 import { sanitizeText, sanitizeURL } from '@/lib/sanitize'
 import { extractYouTubeId, getYouTubeThumbnail } from '@/lib/youtube'
-import { requireAdmin } from '@/lib/auth-guard'
+import { requireContentAdmin } from '@/lib/auth-guard'
 
 // 설교 목록 조회 (공개 - slug 기반만 허용)
 export async function GET(request: NextRequest) {
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     const { title, content, speaker, date, youtubeUrl, series, bibleRef, tags, churchId } = body
 
     // churchId로 권한 검증
-    const authError = await requireAdmin(request, churchId)
+    const authError = await requireContentAdmin(request, churchId)
     if (authError) return authError
 
     if (!title || !content || !speaker || !churchId) {
