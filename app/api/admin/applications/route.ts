@@ -170,6 +170,11 @@ export async function PATCH(request: NextRequest) {
           slug,
           name: application.churchName,
           description: application.description || null,
+          intro:
+            application.description ||
+            `${application.churchName} 공식 웹사이트입니다. 예배와 소식, 교회 소개를 만나보세요.`,
+          heroTitle: `${application.churchName}에 오신 것을 환영합니다`,
+          heroSubtitle: '예배 시간, 설교와 교회 소식을 안내해 드립니다',
           theme: JSON.stringify(
             THEME_PRESETS[application.theme] || THEME_PRESETS.modern
           ),
@@ -181,6 +186,27 @@ export async function PATCH(request: NextRequest) {
           pastorName: application.pastorName,
         },
         select: { id: true, slug: true, name: true },
+      })
+
+      // ── 기본 콘텐츠 씨딩: 고정 환영 공지 ──
+      await tx.notice.create({
+        data: {
+          title: `🎉 ${application.churchName} 웹사이트가 오픈되었습니다`,
+          content: [
+            `<p>환영합니다! <strong>${application.churchName}</strong> 공식 웹사이트가 오픈되었습니다.</p>`,
+            '<p>앞으로 예배 안내, 설교, 교회 소식을 이 곳에서 전해드리겠습니다.</p>',
+            '<hr/>',
+            '<p><strong>교회 담당자 안내</strong></p>',
+            `<ul>`,
+            `<li>관리 페이지: https://churchhub.co.kr/admin/${slug}</li>`,
+            '<li>로그인: https://churchhub.co.kr/login (승인 안내 이메일의 계정 사용)</li>',
+            '<li>설교·공지·갤러리 등 콘텐츠는 관리 페이지에서 직접 등록할 수 있습니다.</li>',
+            '</ul>',
+            '<p>도움이 필요하시면 support@churchhub.co.kr 로 문의해 주세요.</p>',
+          ].join(''),
+          pinned: true,
+          churchId: church.id,
+        },
       })
 
       // ── 교회 관리자 계정 자동 생성 ──
