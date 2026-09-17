@@ -14,6 +14,8 @@ services:
       - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_URL=${AUTH_URL:-http://localhost:3002}
       - NODE_ENV=production
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - RESEND_FROM=${RESEND_FROM:-ChurchHub <support@churchhub.co.kr>}
     depends_on:
       churchhub-db:
         condition: service_healthy
