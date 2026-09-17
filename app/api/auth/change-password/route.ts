@@ -1,5 +1,6 @@
+import { getTokenCompat } from '@/lib/auth-guard'
 import { NextRequest, NextResponse } from 'next/server'
-import { getToken } from 'next-auth/jwt'
+import { getToken as _getToken } from 'next-auth/jwt'
 import { prisma } from '@/lib/prisma'
 import { hashPassword, verifyPassword, validatePasswordStrength } from '@/lib/auth'
 import { authRateLimit } from '@/lib/rate-limit'
@@ -11,7 +12,7 @@ export async function POST(request: NextRequest) {
   const rateLimitResponse = await authRateLimit(request)
   if (rateLimitResponse) return rateLimitResponse
 
-  const token = await getToken({ req: request, secret: SECRET })
+  const token = await getTokenCompat(request)
   if (!token) {
     return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
   }

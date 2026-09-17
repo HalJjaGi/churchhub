@@ -1,6 +1,7 @@
+import { getTokenCompat } from '@/lib/auth-guard'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getToken } from 'next-auth/jwt'
+import { getToken as _getToken } from 'next-auth/jwt'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import { prisma } from '@/lib/prisma'
@@ -54,7 +55,7 @@ function generateTempPassword(): string {
 }
 
 async function requireSuperAdmin(request: NextRequest) {
-  const token = await getToken({ req: request, secret: SECRET })
+  const token = await getTokenCompat(request)
   if (!token || token.role !== 'super_admin') {
     return null
   }

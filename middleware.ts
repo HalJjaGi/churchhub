@@ -1,6 +1,7 @@
+import { getTokenCompat } from './lib/auth-guard'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { getToken } from 'next-auth/jwt'
+import { getToken as _getToken } from 'next-auth/jwt'
 import { prisma } from '@/lib/prisma'
 
 const SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
@@ -17,7 +18,7 @@ export async function middleware(request: NextRequest) {
 
   // 1. 관리자 페이지 접근 제어
   if (pathname.startsWith('/admin')) {
-    const token = await getToken({ req: request, secret: SECRET })
+    const token = await getTokenCompat(request)
     
     if (!token) {
       const loginUrl = new URL('/login', request.url)
@@ -104,7 +105,7 @@ export async function middleware(request: NextRequest) {
       !pathname.startsWith('/api/prayer') &&
       !pathname.startsWith('/api/churches/application') &&
       !pathname.startsWith('/api/applications/search')) {
-    const token = await getToken({ req: request, secret: SECRET })
+    const token = await getTokenCompat(request)
     
     if (!token) {
       return NextResponse.json(

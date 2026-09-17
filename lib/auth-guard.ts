@@ -1,14 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getToken } from 'next-auth/jwt'
+import { getToken as _getToken } from 'next-auth/jwt'
 import { prisma } from '@/lib/prisma'
 
 const SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
+
+// NextAuth v5 호환 토큰 조회
+// HTTPS(직접 또는 프록시/터널 뒤)에서는 쿠키가 __Secure-authjs.session-token으로
+// 설정되므로 secureCookie를 프로토콜에서 판별해서 전달해야 한다.
+export async function getTokenCompat(request: NextRequest) {
+  const xfProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim()
+  const secureCookie =
+    request.nextUrl.protocol === 'https:' || xfProto === 'https'
+  return _getToken({ req: request, secret: SECRET, secureCookie })
+}
 
 // 관리자 권한 확인 (API 라우트용)
 // super_admin: 모든 교회 OK
 // church_admin: 자기 교회만 OK (churchId 검증)
 export async function requireAdmin(request: NextRequest, targetChurchId?: string) {
-  const token = await getToken({ req: request, secret: SECRET })
+  const token = await getTokenCompat(request)
   
   if (!token) {
     return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
@@ -59,7 +69,7 @@ export async function getAuthorizedChurchId(
   request: NextRequest,
   requestedChurchId?: string
 ): Promise<{ churchId: string; error?: NextResponse } | { churchId: null; error: NextResponse }> {
-  const token = await getToken({ req: request, secret: SECRET })
+  const token = await getTokenCompat(request)
   
   if (!token) {
     return { churchId: null, error: NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 }) }

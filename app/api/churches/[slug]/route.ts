@@ -1,3 +1,4 @@
+import { getTokenCompat } from '@/lib/auth-guard'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
@@ -7,7 +8,7 @@ const SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
 // Super Admin 전용 체크
 async function requireSuperAdmin(request: NextRequest) {
   const { getToken } = await import('next-auth/jwt')
-  const token = await getToken({ req: request, secret: SECRET })
+  const token = await getTokenCompat(request)
   if (!token || token.role !== 'super_admin') {
     return NextResponse.json({ error: 'Super Admin 권한이 필요합니다.' }, { status: 403 })
   }
@@ -219,7 +220,7 @@ export async function DELETE(
   // 삭제는 Super Admin만
   const SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
   const { getToken } = await import('next-auth/jwt')
-  const token = await getToken({ req: request, secret: SECRET })
+  const token = await getTokenCompat(request)
   
   if (!token || token.role !== 'super_admin') {
     return NextResponse.json({ error: 'Super Admin 권한이 필요합니다.' }, { status: 403 })

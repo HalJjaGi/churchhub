@@ -1,3 +1,4 @@
+import { getTokenCompat } from '@/lib/auth-guard'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { apiRateLimit } from '@/lib/rate-limit'
@@ -12,7 +13,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { getToken } = await import('next-auth/jwt')
-  const token = await getToken({ req: request, secret: SECRET })
+  const token = await getTokenCompat(request)
   
   if (!token || token.role !== 'super_admin') {
     return NextResponse.json({ error: '권한이 없습니다.' }, { status: 403 })
@@ -72,7 +73,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { getToken } = await import('next-auth/jwt')
-  const token = await getToken({ req: request, secret: SECRET })
+  const token = await getTokenCompat(request)
   
   if (!token || token.role !== 'super_admin') {
     return NextResponse.json({ error: '권한이 없습니다.' }, { status: 403 })
