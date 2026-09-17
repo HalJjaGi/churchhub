@@ -6,7 +6,7 @@ services:
     container_name: churchhub
     restart: unless-stopped
     ports:
-      - "3002:3000"
+      - "127.0.0.1:3002:3000"
     environment:
       - DATABASE_URL=postgresql://churchhub:churchhub_password@churchhub-db:5432/churchhub?schema=public
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
@@ -38,7 +38,7 @@ services:
     volumes:
       - churchhub-pgdata:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U churchhub"]
       interval: 10s
