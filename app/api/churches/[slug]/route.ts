@@ -218,8 +218,6 @@ export async function DELETE(
   const { slug } = await params
 
   // 삭제는 Super Admin만
-  const SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
-  const { getToken } = await import('next-auth/jwt')
   const token = await getTokenCompat(request)
   
   if (!token || token.role !== 'super_admin') {
@@ -227,7 +225,23 @@ export async function DELETE(
   }
 
   try {
-    await prisma.church.delete({ where: { slug } })
+    const church = await prisma.church.findUnique({ where: { slug }, select: { id: true } })
+    if (!church) {
+      return NextResponse.json({ error: '교회를 찾을 수 없습니다.' }, { status: 404 })
+    }
+
+    await prisma.$transaction([
+      // 승인 이력이 영문명(slug)/이메일을 계속 점유하지 않도록 해제
+      prisma.churchApplication.updateMany({
+        where: { churchId: church.id, status: 'approved' },
+        data: {
+          status: 'rejected',
+          slug: null,
+          notes: '교회가 삭제되어 자동 반려 처리됨 (영문명/이메일 재사용 가능)',
+        },
+      }),
+      prisma.church.delete({ where: { slug } }),
+    ])
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

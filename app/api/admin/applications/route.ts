@@ -166,7 +166,9 @@ export async function PATCH(request: NextRequest) {
         throw new Error('SLUG_TAKEN')
       }
 
-      const church = await tx.church.create({
+      let church
+      try {
+        church = await tx.church.create({
         data: {
           slug,
           name: application.churchName,
@@ -188,6 +190,12 @@ export async function PATCH(request: NextRequest) {
         },
         select: { id: true, slug: true, name: true },
       })
+      } catch (e) {
+        if (e && typeof e === 'object' && 'code' in e && (e as { code?: string }).code === 'P2002') {
+          throw new Error('SLUG_TAKEN')
+        }
+        throw e
+      }
 
       // ── 기본 콘텐츠 씨딩: 고정 환영 공지 ──
       await tx.notice.create({
