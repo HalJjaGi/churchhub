@@ -21,6 +21,7 @@ export default function LoginPage() {
         redirect: false,
         email,
         password,
+        portal: 'main',
       })
 
       if (result?.error) {
@@ -105,12 +106,7 @@ export default function LoginPage() {
           </div>
 
           <div className="text-center">
-            <p className="text-sm text-gray-600">
-              계정이 없으신가요?{' '}
-              <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-                회원가입
-              </a>
-            </p>
+            
           </div>
         </form>
       </div>

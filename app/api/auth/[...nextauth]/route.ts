@@ -42,6 +42,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null
         }
 
+        // 포털 분리: 운영자(super_admin)는 전용 경로로만, 교회 계정은 일반 경로로만 로그인
+        const portal = (credentials as { portal?: string }).portal || 'main'
+        if (portal === 'admin') {
+          if (user.role !== 'super_admin') return null
+        } else if (user.role === 'super_admin') {
+          return null
+        }
+
         return {
           id: user.id,
           email: user.email,

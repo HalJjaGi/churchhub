@@ -37,20 +37,7 @@ export default async function HomePage() {
           <Link href="/" className="text-2xl font-bold tracking-tight flex items-center gap-2">
             ⛪ ChurchHub
           </Link>
-          <div className="flex gap-3">
-            <Link
-              href="/login"
-              className="px-4 py-2 text-sm font-medium text-white/90 hover:text-white transition-colors"
-            >
-              로그인
-            </Link>
-            <Link
-              href="/admin"
-              className="px-4 py-2 text-sm font-medium bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
-            >
-              관리자
-            </Link>
-          </div>
+          <div className="flex gap-3" />
         </nav>
 
         <div className="relative max-w-7xl mx-auto px-4 py-20 sm:py-28 sm:px-6 lg:px-8 text-center">

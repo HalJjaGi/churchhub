@@ -9,10 +9,19 @@ const SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
+  // 회원가입은 런치 정책상 차단 (교회 계정은 신청 승인 플로우로만 발급)
+  if (pathname === '/register') {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+  if (pathname === '/api/auth/register') {
+    return NextResponse.json({ error: '회원가입은 현재 제한되어 있습니다.' }, { status: 403 })
+  }
+
   // 정적 파일 및 인증 관련 경로는 스킵
   if (pathname.startsWith('/_next') || 
       pathname.startsWith('/api/auth') ||
-      pathname === '/favicon.ico') {
+      pathname === '/favicon.ico' ||
+      pathname === '/admin-login') {
     return NextResponse.next()
   }
 
